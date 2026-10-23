@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-23T11:13:32Z",
+  "updated": "2026-10-23T11:14:05Z",
   "packs": [
     {
       "id": "trendy",
@@ -75,6 +75,22 @@
       "description": "電腦、網路、程式設計的學術名詞（實驗性，預設不安裝）",
       "source": "國家教育研究院 電子計算機學術名詞",
       "license": "政府資料開放授權條款第 1 版",
+      "bundled": false,
+      "default": false
+    },
+    {
+      "id": "moe_dict",
+      "group": "words",
+      "name": "教育部國語辭典",
+      "version": "2026.10.23.1914",
+      "rows": 83350,
+      "size": 2620759,
+      "sha256": "d489f5c656cf9d1fadb483f9b2f53d38bb20607d81db6ffbc03796c2edfcd16c",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1914/moe_dict-2026.10.23.1914.db.gz",
+      "minAppVersion": 111,
+      "description": "《重編國語辭典修訂本》的詞條與標準注音，含成語、書面語（預設不安裝）",
+      "source": "教育部《重編國語辭典修訂本》（g0v 萌典 moedict-data 整理）",
+      "license": "CC BY-ND 3.0 台灣（教育部）",
       "bundled": false,
       "default": false
     },
