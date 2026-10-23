@@ -27,7 +27,7 @@ dict_db, bigram_db, out_dir, version, base_url = sys.argv[1:6]
 only = sys.argv[6:]
 
 MANIFEST_SCHEMA = 1
-MIN_APP_SCD = 0  # 第一個讀得懂 SCD 資料包的 App versionCode（舊版 App 讀的是 SQLite 資料包，不能裝 SCD）
+MIN_APP_SCD = 123  # 第一個讀得懂 SCD 資料包的 App versionCode（舊版 App 讀的是 SQLite 資料包，不能裝 SCD）
 
 packs = json.load(open(f"{root}/packs.json", encoding="utf-8"))["packs"]
 packs = [p for p in packs if p["id"] != "core" and (not only or p["id"] in only)]
