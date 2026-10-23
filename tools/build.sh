@@ -7,7 +7,8 @@
 #   工作目錄/raw     附加詞庫原始資料（缺的來源保留 base 裡原本的詞）
 #   工作目錄/corpus  接續詞語料
 #   base/            基底詞庫（主詞庫＋目前的附加詞庫、接續詞），沒有就從 base Release 下載
-# 產出：工作目錄/out（資料包，網址指向 Release「packs-<版本>」）、工作目錄/base（更新後的基底詞庫）
+# 產出：工作目錄/out（資料包 <id>-<版本>.scd.gz，網址指向 Release「packs-<版本>」）、
+#       工作目錄/base（更新後的基底詞庫：scorpio_*.db.gz 是建置用的 SQLite，*.scd.gz 是 App 內建的 SCD 詞庫）
 # 上傳由 GitHub Actions 處理
 set -euo pipefail
 W=$(realpath -m "$1"); V=$2; shift 2
@@ -62,7 +63,11 @@ if [ -n "$PLUGINS" ]; then
   "$PY" -I "$R/tools/make_plugins.py" "$W/out" "$V" "https://github.com/$REPO/releases/download/packs-$V" $PLUGINS
 fi
 # 新的 base（給下一次建置與 App 打包用）
-mkdir -p "$W/base"
+mkdir -p "$W/base" "$W/scd"
 gzip -9 -n -c "$W/dict.db" > "$W/base/scorpio_dict.db.gz"
 gzip -9 -n -c "$W/bigram.db" > "$W/base/scorpio_bigram.db.gz"
+# App 內建的 SCD 詞庫（只放內建的資料包；版本是各資料包最後發佈的那版）
+rm -f "$W/scd"/*.scd "$W/base"/*.scd.gz
+"$PY" -I "$R/tools/build_scd.py" --base "$W/dict.db" "$W/bigram.db" "$W/scd" "$V"
+for f in "$W/scd"/*.scd; do gzip -9 -n -c "$f" > "$W/base/$(basename "$f").gz"; done
 ls -la "$W/out" "$W/base"

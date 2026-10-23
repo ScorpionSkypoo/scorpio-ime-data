@@ -22,7 +22,7 @@
 
 `packs.json` 的 `bundled: false` 表示 App 不內建、只能在「字典與學習 → 可下載的詞庫」打開開關下載；`default: false` 表示預設不開。
 
-每個資料包是 gzip 壓縮的 SQLite 檔，放在 Release `packs-<版本>`；版本號是建置時間（`2026.10.23.1530`），App 逐段比數字大小。格式見 [`tools/make_packs.py`](tools/make_packs.py)。
+每個資料包是 gzip 壓縮的 SCD 二進位詞庫（`<id>-<版本>.scd.gz`），放在 Release `packs-<版本>`；App 解壓後直接 mmap 查詢，不經 SQLite。版本號是建置時間（`2026.10.23.1530`），App 逐段比數字大小。格式見 [`docs/scd-format.md`](docs/scd-format.md)、[`tools/scd.py`](tools/scd.py)；建置用的 SQLite 基底詞庫（Release `base` 的 `scorpio_*.db.gz`）轉成 SCD 的流程在 [`tools/build_scd.py`](tools/build_scd.py)、[`tools/make_packs.py`](tools/make_packs.py)，`tools/verify_scd.py` 會逐鍵比對 SCD 與 SQLite 的查詢結果。
 
 `manifest.json` 範例：
 
@@ -33,7 +33,7 @@
     {
       "id": "trendy", "group": "words", "name": "流行與口語用語",
       "version": "2026.10.23", "rows": 154, "size": 4358,
-      "sha256": "…", "url": "https://github.com/…/releases/download/packs-2026.10.23/trendy-2026.10.23.db.gz",
+      "sha256": "…", "url": "https://github.com/…/releases/download/packs-2026.10.23/trendy-2026.10.23.scd.gz",
       "minAppVersion": 103
     }
   ],

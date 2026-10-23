@@ -2,12 +2,9 @@
 """
 把組好的詞庫切成可以單獨下載的資料包，並更新 manifest.json（App 依這份清單檢查更新）。
 
-每個資料包是一個 gzip 壓縮的 SQLite 檔，內含：
-  meta(key, value)   id、group、version、name、description、source、license、url
-  addon_dict         附加詞庫的詞（group = words；流行用語也在這）
-  bigram             接續詞搭配（group = bigram；流行用語的 [pairs] 也在這）
-  kaomoji_dict       顏文字（group = kaomoji，整張表）
-App 套用時，依 meta.id 把同來源的舊資料換掉。輸出的同時把 <dict.db> 的 dict_packs、<bigram.db> 的 pack_versions 改成這一版。
+每個資料包是一個 gzip 壓縮的 SCD 二進位詞庫（格式見 tools/scd.py、tools/build_scd.py）：meta 帶 id、group、version、name、
+description、source、license、url；內容依 group 是詞（流行用語另帶接續詞）、接續詞或顏文字。
+App 解壓後直接 mmap 使用，依 meta.id 換掉同 id 的舊檔。輸出的同時把 <dict.db> 的 dict_packs、<bigram.db> 的 pack_versions 改成這一版。
 
 用法：make_packs.py <dict.db> <bigram.db> <輸出目錄> <版本> <下載網址前綴> [資料包 id...]
   沒給 id 就輸出 packs.json 裡所有能線上更新的資料包（主詞庫 core 跟著 App 走，不做成資料包）
@@ -21,13 +18,16 @@ import sqlite3
 import sys
 import time
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import build_scd  # noqa: E402
+import scd  # noqa: E402
+
 root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 dict_db, bigram_db, out_dir, version, base_url = sys.argv[1:6]
 only = sys.argv[6:]
 
 MANIFEST_SCHEMA = 1
-MIN_APP_VERSION_CODE = 103  # 第一個會讀資料包的 App 版本
-MIN_APP_ONLINE_ONLY = 111   # 第一個支援「只能線上安裝」資料包的 App 版本
+MIN_APP_SCD = 0  # 第一個讀得懂 SCD 資料包的 App versionCode（舊版 App 讀的是 SQLite 資料包，不能裝 SCD）
 
 packs = json.load(open(f"{root}/packs.json", encoding="utf-8"))["packs"]
 packs = [p for p in packs if p["id"] != "core" and (not only or p["id"] in only)]
@@ -35,6 +35,7 @@ os.makedirs(out_dir, exist_ok=True)
 
 src = sqlite3.connect(dict_db)
 src.execute("ATTACH ? AS bg", (bigram_db,))
+bsrc = sqlite3.connect(bigram_db)
 
 manifest_path = f"{root}/manifest.json"
 manifest = json.load(open(manifest_path, encoding="utf-8")) if os.path.exists(manifest_path) else {"packs": []}
@@ -42,42 +43,15 @@ entries = {e["id"]: e for e in manifest.get("packs", [])}
 
 for p in packs:
     pid = p["id"]
-    name = f"{pid}-{version}.db"
+    name = f"{pid}-{version}.scd"
     path = f"{out_dir}/{name}"
-    if os.path.exists(path):
-        os.remove(path)
-    out = sqlite3.connect(path)
-    out.execute("CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
-    meta = {"id": pid, "group": p["group"], "version": version, "name": p["name"], "description": p["description"],
-            "source": p["source"], "license": p["license"], "url": p["url"]}
-    out.executemany("INSERT INTO meta VALUES (?, ?)", meta.items())
-    rows = 0
-    if p["group"] == "words":
-        out.execute("CREATE TABLE addon_dict (reading TEXT NOT NULL, toneless TEXT NOT NULL, word TEXT NOT NULL, score REAL NOT NULL, "
-                    "initials TEXT NOT NULL, finals TEXT NOT NULL, source TEXT NOT NULL)")
-        data = src.execute("SELECT reading, toneless, word, score, initials, finals, source FROM addon_dict WHERE source = ?", (pid,)).fetchall()
-        out.executemany("INSERT INTO addon_dict VALUES (?,?,?,?,?,?,?)", data)
-        rows += len(data)
-    if p["group"] == "bigram" or pid == "trendy":
-        out.execute("CREATE TABLE bigram (prev TEXT NOT NULL, next TEXT NOT NULL, score REAL NOT NULL, source TEXT NOT NULL)")
-        data = src.execute("SELECT prev, next, score, source FROM bg.bigram WHERE source = ?", (pid,)).fetchall()
-        out.executemany("INSERT INTO bigram VALUES (?,?,?,?)", data)
-        rows += len(data)
-    if p["group"] == "kaomoji":
-        out.execute("CREATE TABLE kaomoji_dict (reading TEXT NOT NULL, kaomoji TEXT NOT NULL, category TEXT NOT NULL, priority INTEGER NOT NULL)")
-        data = src.execute("SELECT reading, kaomoji, category, priority FROM kaomoji_dict").fetchall()
-        out.executemany("INSERT INTO kaomoji_dict VALUES (?,?,?,?)", data)
-        rows += len(data)
-    out.commit()
-    out.execute("VACUUM")
-    out.close()
-    if rows == 0:
+    data = build_scd.build(pid, src, bsrc, version)
+    if data is None:
         print(f"{pid}：沒有資料，略過")
-        os.remove(path)
         continue
-    with open(path, "rb") as fi, gzip.GzipFile(f"{path}.gz", "wb", 9, mtime=0) as fo:
-        fo.write(fi.read())
-    os.remove(path)
+    rows = sum(scd.Reader(data).meta.get("rows", {}).values())
+    with gzip.GzipFile(f"{path}.gz", "wb", 9, mtime=0) as fo:
+        fo.write(data)
     blob = open(f"{path}.gz", "rb").read()
     entries[pid] = {
         "id": pid,
@@ -89,7 +63,7 @@ for p in packs:
         "sha256": hashlib.sha256(blob).hexdigest(),
         "url": f"{base_url}/{name}.gz",
         # 不內建的資料包要 App 認得「未安裝、預設不開」才行，舊版 App 會把它當一般詞庫自動裝起來
-        "minAppVersion": MIN_APP_VERSION_CODE if p.get("bundled", True) else MIN_APP_ONLINE_ONLY,
+        "minAppVersion": MIN_APP_SCD,
         "description": p["description"],
         "source": p["source"],
         "license": p["license"],

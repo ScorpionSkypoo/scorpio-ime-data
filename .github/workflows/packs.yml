@@ -76,7 +76,7 @@ jobs:
       - name: 下載基底詞庫
         run: |
           mkdir -p base
-          gh release download base --dir base --pattern '*.gz'
+          gh release download base --dir base --pattern "scorpio_*.db.gz"
         env:
           GH_TOKEN: ${{ github.token }}
 
