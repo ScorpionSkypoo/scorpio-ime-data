@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "updated": "2026-10-23T09:32:19Z",
+  "updated": "2026-10-23T09:37:24Z",
   "packs": [
     {
       "id": "trendy",
       "group": "words",
       "name": "流行與口語用語",
-      "version": "2026.10.23",
+      "version": "2026.10.23.1800",
       "rows": 154,
-      "size": 4358,
-      "sha256": "46b717ab7091529999a990cbe5a8100d9d85ae48c3bb46ad3c11e27aa7f47e97",
-      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23/trendy-2026.10.23.db.gz",
+      "size": 4367,
+      "sha256": "2dd561128b08dc199a33209d16e39cbd0f8920abc18709a3b805aa54506a3573",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1800/trendy-2026.10.23.1800.db.gz",
       "minAppVersion": 103
     },
     {
