@@ -37,7 +37,22 @@ jobs:
       - name: 決定版本與資料包
         id: plan
         run: |
-          echo "version=$(TZ=Asia/Taipei date +%Y.%m.%d.%H%M)" >> "$GITHUB_OUTPUT"
+          # 版本號用台灣時間；萬一 manifest 裡已有更大的版本（手動發佈過），就接在它後面，確保一定往上加
+          V=$(TZ=Asia/Taipei date +%Y.%m.%d.%H%M)
+          V=$(python3 - "$V" <<'PY'
+          import json, sys
+          v = sys.argv[1]
+          key = lambda s: [int(x) for x in s.split(".")]
+          m = json.load(open("manifest.json"))
+          top = max((e["version"] for e in m.get("packs", []) + m.get("plugins", [])), key=key, default="0")
+          if key(top) >= key(v):
+              parts = key(top)
+              parts[-1] += 1
+              v = ".".join(map(str, parts))
+          print(v)
+          PY
+          )
+          echo "version=$V" >> "$GITHUB_OUTPUT"
           if [ -n "${{ github.event.inputs.packs }}" ]; then
             P="${{ github.event.inputs.packs }}"
           else
