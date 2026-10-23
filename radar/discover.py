@@ -7,7 +7,8 @@
   - 凝固度：整串一起出現的機率，遠高於任何一種拆法各自出現的機率相乘（PMI 取最小的那個切點）
   - 自由度：左右兩邊接的字夠多樣（鄰字熵），代表它能獨立使用，不是更長的詞的一部分
   - 不在詞庫裡（主詞庫、附加詞庫、流行用語），也不能整個拆成詞庫裡的兩字以上的詞
-  - 含簡體字的（OpenCC s2t 轉換後會變）不收
+  - 含簡體字或大陸用語的不收（OpenCC：s2t 會變的是簡體字；s2tw 與 s2twp 結果不同的是大陸用語，例如視頻、軟件；
+    OpenCC 沒收的大陸用語列在 sources/mainland_terms.txt）
 另外把 Google Trends 熱搜裡詞庫沒有的詞另外列出（多半是人名、事件，收不收由人決定）。
 
 用法：discover.py <texts.jsonl> <scorpio_dict.db（解壓後）> <報告 report.md> [--apply sources/trendy.txt] [--top 60]
@@ -24,9 +25,13 @@ from collections import Counter, defaultdict
 try:
     import opencc
     _s2t = opencc.OpenCC("s2t")
+    _s2tw = opencc.OpenCC("s2tw")
+    _s2twp = opencc.OpenCC("s2twp")
 
     def is_simplified(w):
-        return _s2t.convert(w) != w
+        """含簡體字，或是大陸用語（例如視頻、軟件、質量）：
+        s2t 轉換會變的是簡體字；s2tw（只轉字形）跟 s2twp（連台灣慣用詞一起轉，用 OpenCC 的 TWPhrases 詞典）結果不同的是大陸用語"""
+        return _s2t.convert(w) != w or _s2tw.convert(w) != _s2twp.convert(w)
 except ImportError:  # 沒裝 opencc 就不過濾
     def is_simplified(w):
         return False
@@ -75,6 +80,10 @@ def main():
     args = ap.parse_args()
 
     vocab = load_vocab(args.dict_db)
+    # 人工維護的大陸用語清單（OpenCC 沒收的），一律排除
+    root = __import__("os").path.dirname(__import__("os").path.dirname(__import__("os").path.abspath(__file__)))
+    mainland = {l.strip() for l in open(f"{root}/sources/mainland_terms.txt", encoding="utf-8")
+                if l.strip() and not l.startswith("#")}
     if args.apply:
         for line in open(args.apply, encoding="utf-8"):
             line = line.strip()
@@ -113,7 +122,7 @@ def main():
     for g, f in ngram.items():
         if not (MIN_LEN <= len(g) <= MAX_LEN) or f < args.min_freq:
             continue
-        if g in vocab or is_simplified(g) or g[0] in EDGE_STOP or g[-1] in END_STOP or splits_into_known(g, vocab):
+        if g in vocab or g in mainland or is_simplified(g) or g[0] in EDGE_STOP or g[-1] in END_STOP or splits_into_known(g, vocab):
             continue
         pmi = min(math.log(p(g) / (p(g[:k]) * p(g[k:]))) for k in range(1, len(g)))
         le, re_ = entropy(left[g]), entropy(right[g])
@@ -139,7 +148,7 @@ def main():
                 return r[max(0, i - 10): i + len(w) + 10]
         return ""
 
-    trend_new = [t for t in dict.fromkeys(trend_topics) if RE_RUN.fullmatch(t) and t not in vocab and not is_simplified(t)]
+    trend_new = [t for t in dict.fromkeys(trend_topics) if RE_RUN.fullmatch(t) and t not in vocab and t not in mainland and not is_simplified(t)]
 
     today = time.strftime("%Y-%m-%d")
     with open(args.report, "w", encoding="utf-8") as f:
