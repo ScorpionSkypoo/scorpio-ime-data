@@ -1,0 +1,58 @@
+#!/usr/bin/env bash
+# 重建指定的資料包並更新 manifest.json
+#
+# 用法：tools/build.sh <工作目錄> <版本> <資料包 id...>
+#   例：tools/build.sh work 2026.10.23 trendy
+#       tools/build.sh work 2026.10.23 bg_wiki bg_ptt bg_dcard   （先跑 tools/fetch_corpus.sh work/corpus）
+#   工作目錄/raw     附加詞庫原始資料（缺的來源保留 base 裡原本的詞）
+#   工作目錄/corpus  接續詞語料
+#   base/            基底詞庫（主詞庫＋目前的附加詞庫、接續詞），沒有就從 base Release 下載
+# 產出：工作目錄/out（資料包，網址指向 Release「packs-<版本>」）、工作目錄/base（更新後的基底詞庫）
+# 上傳由 GitHub Actions 處理
+set -euo pipefail
+W=$(realpath -m "$1"); V=$2; shift 2
+PACKS="$*"
+R=$(dirname "$(dirname "$(realpath "$0")")")
+PY=${PYTHON:-python3}
+REPO=${GITHUB_REPOSITORY:-ScorpionSkypoo/scorpio-ime-data}
+mkdir -p "$W/raw" "$W/corpus" "$W/bg" "$W/out" "$R/base"
+
+for f in scorpio_dict.db.gz scorpio_bigram.db.gz; do
+  [ -s "$R/base/$f" ] || curl -fsSL --retry 3 -o "$R/base/$f" "https://github.com/$REPO/releases/download/base/$f"
+done
+gunzip -c "$R/base/scorpio_dict.db.gz" > "$W/dict.db"
+gunzip -c "$R/base/scorpio_bigram.db.gz" > "$W/bigram.db"
+
+"$PY" -I "$R/tools/build_addon_dicts.py" "$W/raw" "$W/dict.db"
+if [[ " $PACKS " == *" kaomoji "* ]]; then
+  "$PY" -I "$R/tools/build_kaomoji.py" "$W/dict.db" $( [ -f "$W/raw/emoticons.json" ] && echo "$W/raw/emoticons.json" )
+fi
+
+BG=""
+for s in $PACKS; do case $s in bg_*|trendy) BG="$BG $s";; esac; done
+for s in $BG; do
+  rm -f "$W/bg/$s.db"
+  "$PY" -I "$R/tools/build_bigram_packs.py" "$W/dict.db" "$W/corpus" "$R/sources/trendy.txt" "$W/bg/$s.db" "$s" > "$W/bg/$s.log" 2>&1 &
+done
+wait
+for s in $BG; do tail -n 1 "$W/bg/$s.log"; done
+"$PY" -I - "$W/bigram.db" "$W/bg" $BG <<'PYEOF'
+import sqlite3, sys
+out, bg, sources = sys.argv[1], sys.argv[2], sys.argv[3:]
+db = sqlite3.connect(out)
+for s in sources:
+    db.execute("ATTACH ? AS src", (f"{bg}/{s}.db",))
+    if db.execute("SELECT count(*) FROM src.bigram WHERE source = ?", (s,)).fetchone()[0]:
+        db.execute("DELETE FROM bigram WHERE source = ?", (s,))
+        db.execute("INSERT INTO bigram SELECT prev, next, score, source FROM src.bigram WHERE source = ?", (s,))
+    db.commit()
+    db.execute("DETACH src")
+PYEOF
+
+"$PY" -I "$R/tools/make_packs.py" "$W/dict.db" "$W/bigram.db" "$W/out" "$V" \
+  "https://github.com/$REPO/releases/download/packs-$V" $PACKS
+# 新的 base（給下一次建置與 App 打包用）
+mkdir -p "$W/base"
+gzip -9 -n -c "$W/dict.db" > "$W/base/scorpio_dict.db.gz"
+gzip -9 -n -c "$W/bigram.db" > "$W/base/scorpio_bigram.db.gz"
+ls -la "$W/out" "$W/base"
