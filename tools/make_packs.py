@@ -95,6 +95,7 @@ for p in packs:
         "license": p["license"],
         "bundled": p.get("bundled", True),
         "default": p.get("default", True),
+        "category": p.get("category", ""),
     }
     print(f"{pid} {version}：{rows} 筆，{len(blob) / 1024:.0f} KB")
     if not p.get("bundled", True):

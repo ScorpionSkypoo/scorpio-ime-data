@@ -16,7 +16,8 @@
       "source": "人工整理（tools/data/trendy.txt）",
       "license": "本專案自製",
       "bundled": true,
-      "default": true
+      "default": true,
+      "category": "basic"
     },
     {
       "id": "tw_places",
@@ -27,7 +28,8 @@
       "size": 601721,
       "sha256": "586d4cc5ad87d883c4fb3726caf6e93e97ff03c12c3635174236628a37bfa7c9",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23/tw_places-2026.10.23.db.gz",
-      "minAppVersion": 103
+      "minAppVersion": 103,
+      "category": "places"
     },
     {
       "id": "tw_landmarks",
@@ -38,7 +40,8 @@
       "size": 271323,
       "sha256": "35b4b15b79b4ecdc961ef26f52193deffe1542624b330c2d796ff422c67f4f3d",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23/tw_landmarks-2026.10.23.db.gz",
-      "minAppVersion": 103
+      "minAppVersion": 103,
+      "category": "places"
     },
     {
       "id": "world_places",
@@ -49,7 +52,8 @@
       "size": 52888,
       "sha256": "7e8540fbd0ef34874d027f669dff8b126a0aa16502d1aaabce9831af8262e223",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23/world_places-2026.10.23.db.gz",
-      "minAppVersion": 103
+      "minAppVersion": 103,
+      "category": "places"
     },
     {
       "id": "world_landmarks",
@@ -60,7 +64,8 @@
       "size": 95531,
       "sha256": "2e581453b0b2f76a2336189a7247346c055301e78a1773f9296bfc0db35c4e20",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23/world_landmarks-2026.10.23.db.gz",
-      "minAppVersion": 103
+      "minAppVersion": 103,
+      "category": "places"
     },
     {
       "id": "cs_terms",
@@ -76,7 +81,8 @@
       "source": "國家教育研究院 電子計算機學術名詞",
       "license": "政府資料開放授權條款第 1 版",
       "bundled": false,
-      "default": false
+      "default": false,
+      "category": "terms"
     },
     {
       "id": "moe_dict",
@@ -92,7 +98,8 @@
       "source": "教育部《重編國語辭典修訂本》（g0v 萌典 moedict-data 整理）",
       "license": "CC BY-ND 3.0 台灣（教育部）",
       "bundled": false,
-      "default": false
+      "default": false,
+      "category": "basic"
     },
     {
       "id": "kaomoji",
@@ -103,7 +110,8 @@
       "size": 35974,
       "sha256": "97c1c180d02098e65af287f87694cb74c3127bd2650a0669a9e4cadef11d6bc1",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23/kaomoji-2026.10.23.db.gz",
-      "minAppVersion": 103
+      "minAppVersion": 103,
+      "category": "symbols"
     },
     {
       "id": "bg_wiki",
@@ -114,7 +122,8 @@
       "size": 1811836,
       "sha256": "577c0ccef6f225328ace0f02641465e9869d11314316df9a0714302657ba89b5",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23/bg_wiki-2026.10.23.db.gz",
-      "minAppVersion": 103
+      "minAppVersion": 103,
+      "category": "bigram"
     },
     {
       "id": "bg_ptt",
@@ -125,7 +134,8 @@
       "size": 2399275,
       "sha256": "08531103caeb922defb2c3e5805bd076ff1db4b8ff8fc1c0352a83ea50c5f873",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23/bg_ptt-2026.10.23.db.gz",
-      "minAppVersion": 103
+      "minAppVersion": 103,
+      "category": "bigram"
     },
     {
       "id": "bg_dcard",
@@ -136,7 +146,8 @@
       "size": 513441,
       "sha256": "8bdb204ea457ffe3a7246f4d462e0ad212db406b3e88eba301f99698f96d2a45",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23/bg_dcard-2026.10.23.db.gz",
-      "minAppVersion": 103
+      "minAppVersion": 103,
+      "category": "bigram"
     }
   ],
   "plugins": [
