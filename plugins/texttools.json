@@ -2,28 +2,72 @@
   "schema": 1,
   "id": "texttools",
   "name": "文字工具",
-  "icon": "🔤",
+  "icon": "text",
   "description": "選取的文字轉全形、半形、大小寫，或直接拿去搜尋、翻譯",
   "tabs": [
     {
       "name": "轉換",
       "items": [
-        {"label": "轉全形", "action": "transform", "op": "fullwidth"},
-        {"label": "轉半形", "action": "transform", "op": "halfwidth"},
-        {"label": "英文大寫", "action": "transform", "op": "upper"},
-        {"label": "英文小寫", "action": "transform", "op": "lower"},
-        {"label": "字首大寫", "action": "transform", "op": "title"},
-        {"label": "去掉空白", "action": "transform", "op": "trim_spaces"}
+        {
+          "label": "轉全形",
+          "action": "transform",
+          "op": "fullwidth"
+        },
+        {
+          "label": "轉半形",
+          "action": "transform",
+          "op": "halfwidth"
+        },
+        {
+          "label": "英文大寫",
+          "action": "transform",
+          "op": "upper"
+        },
+        {
+          "label": "英文小寫",
+          "action": "transform",
+          "op": "lower"
+        },
+        {
+          "label": "字首大寫",
+          "action": "transform",
+          "op": "title"
+        },
+        {
+          "label": "去掉空白",
+          "action": "transform",
+          "op": "trim_spaces"
+        }
       ]
     },
     {
       "name": "搜尋",
       "items": [
-        {"label": "Google 搜尋", "action": "open_url", "url": "https://www.google.com/search?q={selection}"},
-        {"label": "Google 翻譯", "action": "open_url", "url": "https://translate.google.com/?sl=auto&tl=zh-TW&text={selection}"},
-        {"label": "維基百科", "action": "open_url", "url": "https://zh.wikipedia.org/w/index.php?search={selection}"},
-        {"label": "萌典", "action": "open_url", "url": "https://www.moedict.tw/{selection}"},
-        {"label": "Google 地圖", "action": "open_url", "url": "https://www.google.com/maps/search/{selection}"}
+        {
+          "label": "Google 搜尋",
+          "action": "open_url",
+          "url": "https://www.google.com/search?q={selection}"
+        },
+        {
+          "label": "Google 翻譯",
+          "action": "open_url",
+          "url": "https://translate.google.com/?sl=auto&tl=zh-TW&text={selection}"
+        },
+        {
+          "label": "維基百科",
+          "action": "open_url",
+          "url": "https://zh.wikipedia.org/w/index.php?search={selection}"
+        },
+        {
+          "label": "萌典",
+          "action": "open_url",
+          "url": "https://www.moedict.tw/{selection}"
+        },
+        {
+          "label": "Google 地圖",
+          "action": "open_url",
+          "url": "https://www.google.com/maps/search/{selection}"
+        }
       ]
     }
   ]

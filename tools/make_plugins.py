@@ -19,6 +19,8 @@ only = sys.argv[4:]
 SCHEMA = 1
 ACTIONS = {"insert", "transform", "open_url"}
 OPS = {"fullwidth", "halfwidth", "upper", "lower", "title", "trim_spaces"}
+# App 內建的工具列圖示（跟其他工具列按鈕同風格的向量圖示）；不在清單裡的會顯示通用圖示
+ICONS = {"calendar", "symbols", "text", "search", "star", "note", "link", "clipboard"}
 MIN_APP_VERSION_CODE = 105
 
 
@@ -27,6 +29,7 @@ def validate(p, path):
     for key in ("id", "name", "tabs"):
         assert key in p, f"{path}：缺少 {key}"
     assert p["id"] == os.path.basename(path)[:-5], f"{path}：id 要跟檔名一樣"
+    assert p.get("icon", "") in ICONS | {""}, f"{path}：icon 要是 {sorted(ICONS)} 其中之一"
     for tab in p["tabs"]:
         assert tab.get("name") and tab.get("items"), f"{path}：每個分頁要有 name 和 items"
         for item in tab["items"]:
