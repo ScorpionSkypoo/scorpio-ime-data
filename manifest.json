@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-23T10:26:25Z",
+  "updated": "2026-10-23T10:27:29Z",
   "packs": [
     {
       "id": "trendy",
@@ -109,10 +109,10 @@
       "name": "日期時間",
       "icon": "calendar",
       "description": "插入今天的日期、現在時間、星期",
-      "version": "2026.10.23.1826",
+      "version": "2026.10.23.1827",
       "size": 918,
-      "sha256": "bcc8f0e5fba4df23bd49faf1e6bba78c1d929d7efd34e1503f289fa171da1e61",
-      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1826/datetime-2026.10.23.1826.json",
+      "sha256": "ec5983eccad2808c9873b02a82b51f89bcd0f4e91ae67c92254e2c34061e65e1",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1827/datetime-2026.10.23.1827.json",
       "minAppVersion": 105
     },
     {
@@ -120,10 +120,10 @@
       "name": "常用符號",
       "icon": "symbols",
       "description": "全形標點、括號、箭頭、單位與數學符號",
-      "version": "2026.10.23.1826",
+      "version": "2026.10.23.1827",
       "size": 994,
-      "sha256": "8666afeed5b1708c987bed3b40987def3f32a1a27fb6c56189dd870dc2ba22c2",
-      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1826/symbols-2026.10.23.1826.json",
+      "sha256": "30a73704cf9f81538ba89b5c8e53d0c6cb8282478122d8df5e820b4f6b57e01c",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1827/symbols-2026.10.23.1827.json",
       "minAppVersion": 105
     },
     {
@@ -131,10 +131,10 @@
       "name": "文字工具",
       "icon": "text",
       "description": "選取的文字轉全形、半形、大小寫，或直接拿去搜尋、翻譯",
-      "version": "2026.10.23.1826",
+      "version": "2026.10.23.1827",
       "size": 1123,
-      "sha256": "bc762d81833da67ada715a9c8d6d673e7d4ab9458abaa71ae52df8daa1dc498a",
-      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1826/texttools-2026.10.23.1826.json",
+      "sha256": "c73c89126327277ccc75cc8ed5effdbb0cf87f81c195fe6b61d1ca4efbef504b",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1827/texttools-2026.10.23.1827.json",
       "minAppVersion": 105
     }
   ]
