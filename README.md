@@ -76,7 +76,7 @@
 
 [`radar.yml`](.github/workflows/radar.yml) 每週一自動執行：
 
-1. 蒐集 Google Trends 台灣熱搜，以及 PTT 熱門看板最近 7 天的文章與推文；也會拿熱搜字去 PTT 搜尋相關文章（[`radar/collect.py`](radar/collect.py)）。
+1. 蒐集 Google Trends 台灣熱搜、[Threads 熱門話題統計](https://tools.ccea.tw/threadscount/)過去 7 天的話題標題與摘要，以及 PTT 熱門看板最近 7 天的文章與推文；也會拿熱搜字去 PTT 搜尋相關文章（[`radar/collect.py`](radar/collect.py)）。
 2. 找出詞庫還沒有的新詞（[`radar/discover.py`](radar/discover.py)）：出現次數、凝固度（整串一起出現的機率遠高於拆開）、左右鄰字的多樣性，並排除能拆成兩個已知詞的組合。
 3. 開 PR，把候選詞加進 [`sources/trendy.txt`](sources/trendy.txt)，PR 說明列出每個詞的次數與例句。
 

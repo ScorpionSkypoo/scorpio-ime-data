@@ -5,7 +5,9 @@
 來源：
   1. Google Trends 台灣每日熱搜（RSS）：熱搜關鍵字本身，以及拿它們去 PTT 搜尋到的文章
   2. PTT 熱門看板最近幾天的文章與推文
-  3. Threads 關鍵字搜尋（設定環境變數 THREADS_ACCESS_TOKEN 才會啟用；
+  3. Threads 熱門話題統計（tools.ccea.tw/threadscount，過去 7 天的熱門話題標題與摘要；
+     該站 robots.txt 允許存取、只禁止拿去訓練 AI，這裡只拿來找新詞，一週抓一次）
+  4. Threads 關鍵字搜尋（設定環境變數 THREADS_ACCESS_TOKEN 才會啟用；
      Meta App Review 通過 threads_keyword_search 前只搜得到自己的貼文）
 
 用法：collect.py <輸出 texts.jsonl> [--days 7] [--pages 10]
@@ -90,6 +92,22 @@ def article(url):
     return out
 
 
+def threadscount():
+    """Threads 熱門話題統計：過去 7 天的熱門話題（標題、摘要、涵蓋的事件）"""
+    text = get(f"https://tools.ccea.tw/threadscount/data/live_7d.json?t={int(time.time())}")
+    if not text:
+        return []
+    try:
+        topics = json.loads(text).get("topics", [])
+    except ValueError:
+        return []
+    out = []
+    for t in topics:
+        out.extend(x for x in (t.get("title"), t.get("summary")) if x)
+        out.extend(x for x in t.get("items", []) if isinstance(x, str))
+    return out
+
+
 def board_recent(board, days, pages):
     since = time.time() - days * 86400
     url = f"/bbs/{board}/index.html"
@@ -149,6 +167,11 @@ def main():
             emit("trends", t)
         for t in news:
             emit("trends-news", t)
+
+        tc = threadscount()
+        print(f"Threads 熱門話題統計：{len(tc)} 段")
+        for t in tc:
+            emit("threadscount", t)
 
         for board in BOARDS:
             links = board_recent(board, args.days, args.pages)

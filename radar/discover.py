@@ -144,7 +144,7 @@ def main():
     today = time.strftime("%Y-%m-%d")
     with open(args.report, "w", encoding="utf-8") as f:
         f.write(f"## 新詞雷達 {today}\n\n")
-        f.write(f"語料：{len(runs):,} 段、{total:,} 字（Google Trends 熱搜＋PTT 近期文章與推文）。\n\n")
+        f.write(f"語料：{len(runs):,} 段、{total:,} 字（Google Trends 熱搜、Threads 熱門話題統計 tools.ccea.tw/threadscount、PTT 近期文章與推文）。\n\n")
         f.write("下面的候選詞已經加進 `sources/trendy.txt`。**合併前請在 Files changed 刪掉不要的行**，合併後會自動發佈新版流行用語詞庫。\n\n")
         f.write("| 候選詞 | 次數 | 凝固度 | 左／右自由度 | 例句 |\n|---|---:|---:|---:|---|\n")
         for _, g, fr, pmi, le, re_ in picked:
