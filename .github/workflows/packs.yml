@@ -67,7 +67,7 @@ jobs:
       - name: 發佈
         run: |
           V=${{ steps.plan.outputs.version }}
-          gh release create "packs-$V" work/out/*.gz --title "資料包 $V" \
+          gh release create "packs-$V" work/out/* --title "資料包 $V" \
             --notes "重建：${{ steps.plan.outputs.packs }}"
           gh release upload base work/base/*.gz --clobber
           git config user.name "github-actions[bot]"
