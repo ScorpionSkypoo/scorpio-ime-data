@@ -69,5 +69,7 @@ gzip -9 -n -c "$W/bigram.db" > "$W/base/scorpio_bigram.db.gz"
 # App 內建的 SCD 詞庫（只放內建的資料包；版本是各資料包最後發佈的那版）
 rm -f "$W/scd"/*.scd "$W/base"/*.scd.gz
 "$PY" -I "$R/tools/build_scd.py" --base "$W/dict.db" "$W/bigram.db" "$W/scd" "$V"
+# 逐鍵比對 SCD 與 SQLite（結果、同分順序都要跟 App 舊版的 SQL 一樣），不一致就中止，不發佈
+"$PY" -I "$R/tools/verify_scd.py" "$W/dict.db" "$W/bigram.db" "$W/scd" | tail -n 1
 for f in "$W/scd"/*.scd; do gzip -9 -n -c "$f" > "$W/base/$(basename "$f").gz"; done
 ls -la "$W/out" "$W/base"
