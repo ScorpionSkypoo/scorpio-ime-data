@@ -71,7 +71,7 @@
       "size": 1600025,
       "sha256": "9ee29ce2c823ca0e6831273827ab53f12d8ee5d9fe083fed22363c644e896410",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1905/cs_terms-2026.10.23.1905.db.gz",
-      "minAppVersion": 103,
+      "minAppVersion": 110,
       "description": "電腦、網路、程式設計的學術名詞（實驗性，預設不安裝）",
       "source": "國家教育研究院 電子計算機學術名詞",
       "license": "政府資料開放授權條款第 1 版",

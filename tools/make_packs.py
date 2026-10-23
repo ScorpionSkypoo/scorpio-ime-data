@@ -27,6 +27,7 @@ only = sys.argv[6:]
 
 MANIFEST_SCHEMA = 1
 MIN_APP_VERSION_CODE = 103  # 第一個會讀資料包的 App 版本
+MIN_APP_ONLINE_ONLY = 110   # 第一個支援「只能線上安裝」資料包的 App 版本
 
 packs = json.load(open(f"{root}/packs.json", encoding="utf-8"))["packs"]
 packs = [p for p in packs if p["id"] != "core" and (not only or p["id"] in only)]
@@ -87,7 +88,8 @@ for p in packs:
         "size": len(blob),
         "sha256": hashlib.sha256(blob).hexdigest(),
         "url": f"{base_url}/{name}.gz",
-        "minAppVersion": MIN_APP_VERSION_CODE,
+        # 不內建的資料包要 App 認得「未安裝、預設不開」才行，舊版 App 會把它當一般詞庫自動裝起來
+        "minAppVersion": MIN_APP_VERSION_CODE if p.get("bundled", True) else MIN_APP_ONLINE_ONLY,
         "description": p["description"],
         "source": p["source"],
         "license": p["license"],
