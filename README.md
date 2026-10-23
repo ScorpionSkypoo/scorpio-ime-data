@@ -37,7 +37,40 @@
 }
 ```
 
-`minAppVersion` 是能套用這個資料包的最低 App versionCode。`layouts` 預留給之後的鍵盤版面、符號版面、工具列擴充選單。
+`minAppVersion` 是能套用這個資料包的最低 App versionCode。`plugins` 是工具列擴充功能（見下面），`layouts` 預留給之後的鍵盤版面、符號版面。
+
+## 擴充功能（工具列外掛）
+
+`plugins/<id>.json`，在 App「設定 → 擴充功能」線上安裝，裝好後出現在鍵盤工具列的方塊按鈕裡，也能釘選到工具列。
+
+外掛是**宣告式**的：只能組合 App 內建的三種動作，不含任何程式碼，也讀不到使用者打的字；只有使用者點了項目時，才會用到目前選取的文字。
+
+| 動作 | 說明 | 欄位 |
+|---|---|---|
+| `insert`（預設） | 插入文字 | `insert`：可用 `{date:格式}`、`{time:格式}`（Java SimpleDateFormat）、`{weekday}`、`{weekday:short}`、`{roc}`（民國年）、`{selection}` |
+| `transform` | 轉換選取的文字 | `op`：`fullwidth`、`halfwidth`、`upper`、`lower`、`title`、`trim_spaces` |
+| `open_url` | 用選取的文字開網址 | `url`：只接受 `https://`，`{selection}` 會先做 URL 編碼 |
+
+```json
+{
+  "schema": 1,
+  "id": "datetime",
+  "name": "日期時間",
+  "icon": "📅",
+  "description": "插入今天的日期、現在時間、星期",
+  "tabs": [
+    {"name": "日期", "items": [
+      {"label": "{date:yyyy/MM/dd}", "insert": "{date:yyyy/MM/dd}"},
+      "、"
+    ]}
+  ]
+}
+```
+
+- 項目直接寫字串，等於「顯示這段、插入這段」。`label` 也會展開日期標記，面板上看得到實際會插入什麼。
+- `id` 要跟檔名一樣。`icon` 建議用一個 emoji 或一兩個字，釘選到工具列時顯示。
+- App 不認得的動作會略過，所以之後新增動作不會讓舊版 App 出錯。
+- 推上 main 後，[`packs.yml`](.github/workflows/packs.yml) 會驗證格式並發佈有改到的外掛；已安裝的使用者隔天自動更新。
 
 ## 新詞雷達
 
