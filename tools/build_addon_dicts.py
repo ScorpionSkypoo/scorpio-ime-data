@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-附加詞庫：流行與口語用語、台灣地名與路名、台灣景點地標、世界國家與城市、世界地標與地理
+附加詞庫：流行與口語用語、台灣地名與路名、台灣景點地標、世界國家與城市、世界地標與地理、資訊工程術語
 
 資料來源（皆為開放授權，名稱、來源與授權記在 packs.json，會寫進 dict_packs 表給 App 顯示）：
   - 人工整理的流行與口語用語 sources/trendy.txt
@@ -8,6 +8,7 @@
   - 交通部觀光署「景點 - 觀光資訊資料庫」AttractionList.json（政府資料開放授權條款第 1 版）
   - Unicode CLDR zh-Hant 地區名與時區城市名 terr.json、tz.json（Unicode License）
   - Wikidata 人口 40 萬以上城市、地標與地理 cities.csv、landmarks.csv（CC0）
+  - 國家教育研究院「電子計算機學術名詞」naer_cs_terms.csv（政府資料開放授權條款第 1 版）
 
 讀音以主詞庫推得：詞內能對到主詞庫的多字詞就用它的讀音（破音字跟著詞走），其餘單字取最常用讀音；
 有主詞庫沒有的字就整個略過。主詞庫已有同字同讀音的詞不重複收錄。
@@ -178,6 +179,39 @@ for line in (csv.reader(open(f"{raw}/landmarks.csv")) if "world_landmarks" in bu
     if name:
         add(name, links_score(int(links or 0), -6.4, -5.0), "world_landmarks")
 
+# 5. 資訊工程術語（國家教育研究院 電子計算機學術名詞）：只收主詞庫沒有、也不能由已知詞組合出來的術語，
+#    排除簡體字與大陸用語；這份是實驗性、預設不安裝的資料包，分數壓低
+if have("naer_cs_terms.csv"):
+    built.add("cs_terms")
+    try:
+        import opencc
+        _s2t, _s2tw, _s2twp = opencc.OpenCC("s2t"), opencc.OpenCC("s2tw"), opencc.OpenCC("s2twp")
+        mainland = lambda w: _s2t.convert(w) != w or _s2tw.convert(w) != _s2twp.convert(w)
+    except ImportError:
+        mainland = lambda w: False
+    known = set(word_reading)
+
+    def composable(w):
+        n = len(w)
+        ok = [False] * (n + 1)
+        ok[0] = True
+        for i in range(n):
+            if ok[i]:
+                for j in range(i + 2, n + 1):
+                    if w[i:j] in known:
+                        ok[j] = True
+        return ok[n]
+
+    seen = set()
+    with open(f"{raw}/naer_cs_terms.csv", encoding="utf-8-sig") as f:
+        for x in csv.DictReader(f):
+            for part in re.split(r"[；;、,，/]", x["中文名稱"]):
+                w = re.sub(r"[（(\[【].*?[)）\]】]", "", part).strip()
+                if w in seen or not re.fullmatch(r"[\u4e00-\u9fff]{2,6}", w) or w in known or composable(w) or mainland(w):
+                    continue
+                seen.add(w)
+                add(w, -6.8, "cs_terms")
+
 db.execute("CREATE TABLE IF NOT EXISTS addon_dict (reading TEXT NOT NULL, toneless TEXT NOT NULL, word TEXT NOT NULL, score REAL NOT NULL, "
            "initials TEXT NOT NULL, finals TEXT NOT NULL, source TEXT NOT NULL)")
 for src in built:
@@ -194,11 +228,13 @@ except sqlite3.OperationalError:
     old_versions = {}
 db.execute("DROP TABLE IF EXISTS dict_packs")
 db.execute("CREATE TABLE dict_packs (id TEXT PRIMARY KEY, grp TEXT NOT NULL, name TEXT NOT NULL, description TEXT NOT NULL, "
-           "source TEXT NOT NULL, license TEXT NOT NULL, url TEXT NOT NULL, version TEXT NOT NULL, sort INTEGER NOT NULL)")
+           "source TEXT NOT NULL, license TEXT NOT NULL, url TEXT NOT NULL, version TEXT NOT NULL, sort INTEGER NOT NULL, "
+           "default_on INTEGER NOT NULL DEFAULT 1)")
 packs = json.load(open(f"{root}/packs.json", encoding="utf-8"))["packs"]
-db.executemany("INSERT INTO dict_packs VALUES (?,?,?,?,?,?,?,?,?)",
-               [(p["id"], p["group"], p["name"], p["description"], p["source"], p["license"], p["url"], old_versions.get(p["id"], p["version"]), i)
-                for i, p in enumerate(packs)])
+db.executemany("INSERT INTO dict_packs VALUES (?,?,?,?,?,?,?,?,?,?)",
+               [(p["id"], p["group"], p["name"], p["description"], p["source"], p["license"], p["url"], old_versions.get(p["id"], p["version"]), i,
+                 1 if p.get("default", True) else 0)
+                for i, p in enumerate(packs) if p.get("bundled", True)])
 # 主詞庫標記來源：啟用的附加／匯入詞庫會插進 dict（source 標名稱），停用時依 source 刪掉
 cols = [r[1] for r in db.execute("PRAGMA table_info(dict)")]
 if "source" not in cols:

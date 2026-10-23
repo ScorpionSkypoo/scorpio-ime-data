@@ -8,7 +8,7 @@
   - 自由度：左右兩邊接的字夠多樣（鄰字熵），代表它能獨立使用，不是更長的詞的一部分
   - 不在詞庫裡（主詞庫、附加詞庫、流行用語），也不能整個拆成詞庫裡的兩字以上的詞
   - 含簡體字或大陸用語的不收（OpenCC：s2t 會變的是簡體字；s2tw 與 s2twp 結果不同的是大陸用語，例如視頻、軟件；
-    OpenCC 沒收的大陸用語列在 sources/mainland_terms.txt）
+    OpenCC 沒收的大陸用語列在 sources/mainland_terms*.txt）
 另外把 Google Trends 熱搜裡詞庫沒有的詞另外列出（多半是人名、事件，收不收由人決定）。
 
 用法：discover.py <texts.jsonl> <scorpio_dict.db（解壓後）> <報告 report.md> [--apply sources/trendy.txt] [--top 60]
@@ -82,8 +82,10 @@ def main():
     vocab = load_vocab(args.dict_db)
     # 人工維護的大陸用語清單（OpenCC 沒收的），一律排除
     root = __import__("os").path.dirname(__import__("os").path.dirname(__import__("os").path.abspath(__file__)))
-    mainland = {l.strip() for l in open(f"{root}/sources/mainland_terms.txt", encoding="utf-8")
-                if l.strip() and not l.startswith("#")}
+    mainland = set()
+    for name in sorted(__import__("os").listdir(f"{root}/sources")):
+        if name.startswith("mainland_terms") and name.endswith(".txt"):
+            mainland |= {l.strip() for l in open(f"{root}/sources/{name}", encoding="utf-8") if l.strip() and not l.startswith("#")}
     if args.apply:
         for line in open(args.apply, encoding="utf-8"):
             line = line.strip()

@@ -1,5 +1,5 @@
 {
-  "_說明": "所有資料包的名稱、說明、來源與授權。group：words＝增加打得出的詞；bigram＝只影響詞與詞的接續（整句選字、選完字後的聯想）；kaomoji＝顏文字。version 只是第一次的預設值，之後每次建置由 tools/build.sh 以日期版本號寫進 base 詞庫與 manifest.json。",
+  "_說明": "所有資料包的名稱、說明、來源與授權。group：words＝增加打得出的詞；bigram＝只影響詞與詞的接續（整句選字、選完字後的聯想）；kaomoji＝顏文字。version 只是第一次的預設值，之後每次建置由 tools/build.sh 以日期版本號寫進 base 詞庫與 manifest.json。bundled：是否內建在 App（false＝只能線上安裝）；default：預設要不要開。",
   "packs": [
     {
       "id": "core",
@@ -60,6 +60,18 @@
       "license": "CC0",
       "url": "https://www.wikidata.org/",
       "version": "2026.10"
+    },
+    {
+      "id": "cs_terms",
+      "group": "words",
+      "name": "資訊工程術語",
+      "description": "電腦、網路、程式設計的學術名詞（實驗性，預設不安裝）",
+      "source": "國家教育研究院 電子計算機學術名詞",
+      "license": "政府資料開放授權條款第 1 版",
+      "url": "https://data.gov.tw/dataset/15416",
+      "version": "2026.10",
+      "bundled": false,
+      "default": false
     },
     {
       "id": "kaomoji",

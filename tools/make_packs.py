@@ -88,11 +88,24 @@ for p in packs:
         "sha256": hashlib.sha256(blob).hexdigest(),
         "url": f"{base_url}/{name}.gz",
         "minAppVersion": MIN_APP_VERSION_CODE,
+        "description": p["description"],
+        "source": p["source"],
+        "license": p["license"],
+        "bundled": p.get("bundled", True),
+        "default": p.get("default", True),
     }
     print(f"{pid} {version}：{rows} 筆，{len(blob) / 1024:.0f} KB")
+    if not p.get("bundled", True):
+        # 只能線上安裝的資料包不放進 base（App 不內建）
+        src.execute("DELETE FROM addon_dict WHERE source = ?", (pid,))
+        src.execute("DELETE FROM bg.bigram WHERE source = ?", (pid,))
+        src.execute("DELETE FROM dict_packs WHERE id = ?", (pid,))
+        src.commit()
+        print(f"{pid}：不內建，已從 base 移除")
+        continue
     # base 詞庫記下這版，App 打包時內建的就是最新版，不必一裝好就重新下載
     if src.execute("UPDATE dict_packs SET version = ? WHERE id = ?", (version, pid)).rowcount == 0:
-        src.execute("INSERT INTO dict_packs VALUES (?,?,?,?,?,?,?,?,?)",
+        src.execute("INSERT INTO dict_packs (id, grp, name, description, source, license, url, version, sort) VALUES (?,?,?,?,?,?,?,?,?)",
                     (pid, p["group"], p["name"], p["description"], p["source"], p["license"], p["url"], version, 99))
     if p["group"] == "bigram" or pid == "trendy":
         src.execute("CREATE TABLE IF NOT EXISTS bg.pack_versions (id TEXT PRIMARY KEY, version TEXT NOT NULL)")
