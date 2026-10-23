@@ -39,7 +39,10 @@ jobs:
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
 
       - name: 找新詞
-        run: python radar/discover.py work/texts.jsonl work/dict.db work/report.md --apply sources/trendy.txt
+        run: |
+          # OpenCC GitHub master 最新的台灣用語詞典（pip 版只到它發佈的那版）
+          curl -fsSL -o work/TWPhrases.txt https://raw.githubusercontent.com/BYVoid/OpenCC/master/data/dictionary/TWPhrases.txt || true
+          python radar/discover.py work/texts.jsonl work/dict.db work/report.md --apply sources/trendy.txt --opencc-twphrases work/TWPhrases.txt
 
       - name: 開 PR
         run: |

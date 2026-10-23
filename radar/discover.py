@@ -77,6 +77,7 @@ def main():
     ap.add_argument("--apply")
     ap.add_argument("--top", type=int, default=60)
     ap.add_argument("--min-freq", type=int, default=6)
+    ap.add_argument("--opencc-twphrases", help="OpenCC GitHub master 最新的 TWPhrases.txt（左欄是大陸用語）")
     args = ap.parse_args()
 
     vocab = load_vocab(args.dict_db)
@@ -86,6 +87,14 @@ def main():
     for name in sorted(__import__("os").listdir(f"{root}/sources")):
         if name.startswith("mainland_terms") and name.endswith(".txt"):
             mainland |= {l.strip() for l in open(f"{root}/sources/{name}", encoding="utf-8") if l.strip() and not l.startswith("#")}
+    # pip 版 OpenCC 的詞典只到它發佈的那版；這裡再加上 GitHub master 最新的 TWPhrases（大陸用語 → 台灣用語）
+    if args.opencc_twphrases and __import__("os").path.exists(args.opencc_twphrases):
+        for line in open(args.opencc_twphrases, encoding="utf-8"):
+            if line.startswith("#") or "\t" not in line:
+                continue
+            key, values = line.rstrip("\n").split("\t", 1)
+            if key not in values.split():
+                mainland.add(key)
     if args.apply:
         for line in open(args.apply, encoding="utf-8"):
             line = line.strip()

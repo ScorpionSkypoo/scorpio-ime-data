@@ -12,11 +12,15 @@
 | `world_places` | 國家地區名稱、世界主要城市 | 詞 |
 | `world_landmarks` | 知名建築、博物館、山岳、湖泊、島嶼 | 詞 |
 | `kaomoji` | 顏文字（28 個分類） | 顏文字 |
+| `cs_terms` | 資訊工程術語（國家教育研究院電子計算機學術名詞，約 4 萬詞） | 詞，**只能線上安裝、預設不開** |
+| `moe_dict` | 教育部國語辭典（重編國語辭典修訂本，約 8.3 萬詞，含成語、書面語，附官方注音） | 詞，**只能線上安裝、預設不開** |
 | `bg_wiki` | 維基百科的詞與詞搭配 | 接續詞 |
 | `bg_ptt` | PTT 文章、推文的詞與詞搭配 | 接續詞 |
 | `bg_dcard` | Dcard 討論串的詞與詞搭配 | 接續詞 |
 
 主詞庫（小麥注音）、英文、倉頡、Emoji 跟著 App 一起發佈，不做線上更新。
+
+`packs.json` 的 `bundled: false` 表示 App 不內建、只能在「字典與學習 → 可下載的詞庫」打開開關下載；`default: false` 表示預設不開。
 
 每個資料包是 gzip 壓縮的 SQLite 檔，放在 Release `packs-<版本>`；版本號是建置時間（`2026.10.23.1530`），App 逐段比數字大小。格式見 [`tools/make_packs.py`](tools/make_packs.py)。
 
@@ -78,7 +82,12 @@
 
 1. 蒐集 Google Trends 台灣熱搜、[Threads 熱門話題統計](https://tools.ccea.tw/threadscount/)過去 7 天的話題標題與摘要，以及 PTT 熱門看板最近 7 天的文章與推文；也會拿熱搜字去 PTT 搜尋相關文章（[`radar/collect.py`](radar/collect.py)）。
 2. 找出詞庫還沒有的新詞（[`radar/discover.py`](radar/discover.py)）：出現次數、凝固度（整串一起出現的機率遠高於拆開）、左右鄰字的多樣性，並排除能拆成兩個已知詞的組合。
-3. 開 PR，把候選詞加進 [`sources/trendy.txt`](sources/trendy.txt)，PR 說明列出每個詞的次數與例句。
+3. 排除簡體字與大陸用語：
+   - OpenCC（`pip install opencc` 每次裝 PyPI 最新版）：`s2t` 轉換會變的是簡體字；`s2tw` 跟 `s2twp` 結果不同的是大陸用語。
+   - OpenCC GitHub master 最新的 [`TWPhrases.txt`](https://github.com/BYVoid/OpenCC/blob/master/data/dictionary/TWPhrases.txt)：每次執行直接下載，左欄的大陸用語都排除（不必等 OpenCC 發新版）。
+   - [`sources/mainland_terms.txt`](sources/mainland_terms.txt)：OpenCC 沒收的大陸用語（靠譜、老鐵、內卷…），人工維護。
+   - [`sources/mainland_terms_naer.txt`](sources/mainland_terms_naer.txt)：國家教育研究院〈兩岸對照名詞－計算機〉裡跟台灣譯名不同的大陸譯名。
+4. 開 PR，把候選詞加進 [`sources/trendy.txt`](sources/trendy.txt)，PR 說明列出每個詞的次數與例句。
 
 **審核**：在 PR 的 Files changed 刪掉不要的詞再合併。合併後 [`packs.yml`](.github/workflows/packs.yml) 會重建 `trendy` 並發佈新版，手機隔天就會更新。
 

@@ -74,6 +74,18 @@
       "default": false
     },
     {
+      "id": "moe_dict",
+      "group": "words",
+      "name": "教育部國語辭典",
+      "description": "《重編國語辭典修訂本》的詞條與標準注音，含成語、書面語（預設不安裝）",
+      "source": "教育部《重編國語辭典修訂本》（g0v 萌典 moedict-data 整理）",
+      "license": "CC BY-ND 3.0 台灣（教育部）",
+      "url": "https://github.com/g0v/moedict-data",
+      "version": "2026.10",
+      "bundled": false,
+      "default": false
+    },
+    {
       "id": "kaomoji",
       "group": "kaomoji",
       "name": "顏文字",

@@ -81,7 +81,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: 下載語料與原始資料
-        if: contains(steps.plan.outputs.packs, 'bg_') || contains(steps.plan.outputs.packs, 'cs_terms')
+        if: contains(steps.plan.outputs.packs, 'bg_') || contains(steps.plan.outputs.packs, 'cs_terms') || contains(steps.plan.outputs.packs, 'moe_dict')
         run: tools/fetch_corpus.sh work/corpus ${{ steps.plan.outputs.packs }}
 
       - name: 建置

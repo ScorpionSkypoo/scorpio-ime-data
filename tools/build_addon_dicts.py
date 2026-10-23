@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-附加詞庫：流行與口語用語、台灣地名與路名、台灣景點地標、世界國家與城市、世界地標與地理、資訊工程術語
+附加詞庫：流行與口語用語、台灣地名與路名、台灣景點地標、世界國家與城市、世界地標與地理、資訊工程術語、教育部國語辭典
 
 資料來源（皆為開放授權，名稱、來源與授權記在 packs.json，會寫進 dict_packs 表給 App 顯示）：
   - 人工整理的流行與口語用語 sources/trendy.txt
@@ -9,6 +9,7 @@
   - Unicode CLDR zh-Hant 地區名與時區城市名 terr.json、tz.json（Unicode License）
   - Wikidata 人口 40 萬以上城市、地標與地理 cities.csv、landmarks.csv（CC0）
   - 國家教育研究院「電子計算機學術名詞」naer_cs_terms.csv（政府資料開放授權條款第 1 版）
+  - 教育部《重編國語辭典修訂本》dict-revised.json（g0v moedict-data，CC BY-ND 3.0 台灣）
 
 讀音以主詞庫推得：詞內能對到主詞庫的多字詞就用它的讀音（破音字跟著詞走），其餘單字取最常用讀音；
 有主詞庫沒有的字就整個略過。主詞庫已有同字同讀音的詞不重複收錄。
@@ -211,6 +212,25 @@ if have("naer_cs_terms.csv"):
                     continue
                 seen.add(w)
                 add(w, -6.8, "cs_terms")
+
+# 6. 教育部國語辭典（重編國語辭典修訂本，g0v moedict-data）：詞條與官方注音，只收主詞庫沒有的詞
+#    依教育部對 CC BY-ND 的解釋，格式轉換與後續應用不算改作；這裡只取詞條與注音，不動釋義文字
+if have("dict-revised.json"):
+    built.add("moe_dict")
+    BOPO = re.compile(r"^[\u3105-\u3129ˊˇˋ˙]+$")
+    for e in json.load(open(f"{raw}/dict-revised.json", encoding="utf-8")):
+        w = e.get("title", "")
+        if not re.fullmatch(r"[\u4e00-\u9fff]{2,8}", w) or w in word_reading:
+            continue
+        for h in e.get("heteronyms", []):
+            syl = []
+            for x in (h.get("bopomofo") or "").replace("\u3000", " ").split():
+                if x.startswith("˙"):  # 萌典輕聲寫在前面（˙ㄉㄜ），詞庫寫在後面（ㄉㄜ˙）
+                    x = x[1:] + "˙"
+                syl.append(x)
+            if len(syl) == len(w) and all(BOPO.match(x) for x in syl):
+                add(w, -6.6, "moe_dict", "-".join(syl))
+                break
 
 db.execute("CREATE TABLE IF NOT EXISTS addon_dict (reading TEXT NOT NULL, toneless TEXT NOT NULL, word TEXT NOT NULL, score REAL NOT NULL, "
            "initials TEXT NOT NULL, finals TEXT NOT NULL, source TEXT NOT NULL)")
