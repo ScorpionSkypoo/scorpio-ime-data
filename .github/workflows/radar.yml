@@ -1,0 +1,55 @@
+name: 新詞雷達
+
+# 每週一早上（台灣時間 02:00）蒐集 Google Trends 熱搜與 PTT 近期文章、推文，
+# 找出詞庫還沒有的新詞，開 PR 把候選詞加進 sources/trendy.txt。
+# 審核時刪掉不要的行再合併，合併後「建置並發佈資料包」會自動發佈新版流行用語。
+on:
+  schedule:
+    - cron: "0 18 * * 0"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  radar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install opencc   # 過濾含簡體字的候選詞
+
+      - name: 下載基底詞庫
+        run: |
+          mkdir -p base work
+          gh release download base --dir base --pattern 'scorpio_dict.db.gz'
+          gunzip -c base/scorpio_dict.db.gz > work/dict.db
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: 蒐集語料
+        run: python radar/collect.py work/texts.jsonl --days 7
+        env:
+          # 選用：Meta 通過 threads_keyword_search 審核後，把 token 放進 repo secrets 就會一起搜尋 Threads
+          THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
+
+      - name: 找新詞
+        run: python radar/discover.py work/texts.jsonl work/dict.db work/report.md --apply sources/trendy.txt
+
+      - name: 開 PR
+        run: |
+          if git diff --quiet; then echo "沒有新的候選詞"; exit 0; fi
+          D=$(TZ=Asia/Taipei date +%Y-%m-%d)
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "radar/$D"
+          git commit -am "新詞雷達 $D 候選詞"
+          git push -u origin "radar/$D"
+          gh pr create --title "新詞雷達 $D" --body-file work/report.md
+        env:
+          GH_TOKEN: ${{ github.token }}

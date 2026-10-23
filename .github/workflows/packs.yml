@@ -1,0 +1,79 @@
+name: 建置並發佈資料包
+
+# sources/、packs.json 有變動（例如新詞雷達的 PR 合併）就重建流行用語；plugins/ 有變動就重建改到的外掛；
+# 也可以手動執行，指定要重建的資料包或外掛（接續詞語料會先下載約 750 MB 的語料）
+on:
+  push:
+    branches: [main]
+    paths: ["sources/**", "packs.json", "plugins/**"]
+  workflow_dispatch:
+    inputs:
+      packs:
+        description: "要重建的資料包（空白分隔）"
+        default: "trendy"
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: packs
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - run: pip install opencc pyarrow
+
+      - name: 決定版本與資料包
+        id: plan
+        run: |
+          echo "version=$(TZ=Asia/Taipei date +%Y.%m.%d.%H%M)" >> "$GITHUB_OUTPUT"
+          if [ -n "${{ github.event.inputs.packs }}" ]; then
+            P="${{ github.event.inputs.packs }}"
+          else
+            CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+            P=""
+            echo "$CHANGED" | grep -qE '^(sources/|packs.json)' && P="trendy"
+            for f in $(echo "$CHANGED" | grep -E '^plugins/.+\.json$'); do
+              [ -f "$f" ] && P="$P $(basename "$f" .json)"
+            done
+          fi
+          echo "packs=$P" >> "$GITHUB_OUTPUT"
+
+      - name: 下載基底詞庫
+        run: |
+          mkdir -p base
+          gh release download base --dir base --pattern '*.gz'
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: 下載接續詞語料
+        if: contains(steps.plan.outputs.packs, 'bg_')
+        run: tools/fetch_corpus.sh work/corpus ${{ steps.plan.outputs.packs }}
+
+      - name: 建置
+        run: tools/build.sh work ${{ steps.plan.outputs.version }} ${{ steps.plan.outputs.packs }}
+
+      - name: 發佈
+        run: |
+          V=${{ steps.plan.outputs.version }}
+          gh release create "packs-$V" work/out/*.gz --title "資料包 $V" \
+            --notes "重建：${{ steps.plan.outputs.packs }}"
+          gh release upload base work/base/*.gz --clobber
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add manifest.json
+          git commit -m "資料包 $V：${{ steps.plan.outputs.packs }}"
+          git push
+        env:
+          GH_TOKEN: ${{ github.token }}
