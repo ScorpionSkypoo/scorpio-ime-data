@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-23T09:37:24Z",
+  "updated": "2026-10-23T09:53:00Z",
   "packs": [
     {
       "id": "trendy",
@@ -102,5 +102,40 @@
       "minAppVersion": 103
     }
   ],
-  "layouts": []
+  "layouts": [],
+  "plugins": [
+    {
+      "id": "datetime",
+      "name": "日期時間",
+      "icon": "📅",
+      "description": "插入今天的日期、現在時間、星期",
+      "version": "2026.10.23.1900",
+      "size": 914,
+      "sha256": "6e9dc7d62de0ca39d70bd46a5c612ffdfa0f8cf7a3c85241f347a7e9719ce4c7",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1900/datetime-2026.10.23.1900.json",
+      "minAppVersion": 105
+    },
+    {
+      "id": "symbols",
+      "name": "常用符號",
+      "icon": "※",
+      "description": "全形標點、括號、箭頭、單位與數學符號",
+      "version": "2026.10.23.1900",
+      "size": 990,
+      "sha256": "d5de65f3dcdcd8b19962a91c0b7f0023f04a76a4de026d55f7d4d72a5658b754",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1900/symbols-2026.10.23.1900.json",
+      "minAppVersion": 105
+    },
+    {
+      "id": "texttools",
+      "name": "文字工具",
+      "icon": "🔤",
+      "description": "選取的文字轉全形、半形、大小寫，或直接拿去搜尋、翻譯",
+      "version": "2026.10.23.1900",
+      "size": 1123,
+      "sha256": "07f929e1f76a4fa46c2f84675fe1982f08bcbfa06a1aa4d04ba0cdd27b3620a5",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1900/texttools-2026.10.23.1900.json",
+      "minAppVersion": 105
+    }
+  ]
 }

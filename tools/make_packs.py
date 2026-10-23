@@ -104,7 +104,9 @@ manifest = {
     "schema": MANIFEST_SCHEMA,
     "updated": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
     "packs": sorted(entries.values(), key=lambda e: order.index(e["id"]) if e["id"] in order else 999),
-    # 之後的鍵盤版面、符號版面、工具列擴充選單也放這裡（各自有版本）
+    # 工具列擴充功能（tools/make_plugins.py 寫入）
+    "plugins": manifest.get("plugins", []),
+    # 之後的鍵盤版面、符號版面也放這裡（各自有版本）
     "layouts": manifest.get("layouts", []),
 }
 with open(manifest_path, "w", encoding="utf-8") as f:

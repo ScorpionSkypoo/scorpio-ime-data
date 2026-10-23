@@ -1,0 +1,30 @@
+{
+  "schema": 1,
+  "id": "datetime",
+  "name": "日期時間",
+  "icon": "📅",
+  "description": "插入今天的日期、現在時間、星期",
+  "tabs": [
+    {
+      "name": "日期",
+      "items": [
+        {"label": "{date:yyyy/MM/dd}", "insert": "{date:yyyy/MM/dd}"},
+        {"label": "{date:yyyy-MM-dd}", "insert": "{date:yyyy-MM-dd}"},
+        {"label": "{date:M月d日}", "insert": "{date:M月d日}"},
+        {"label": "{date:yyyy年M月d日}", "insert": "{date:yyyy年M月d日}"},
+        {"label": "民國{roc}年{date:M月d日}", "insert": "民國{roc}年{date:M月d日}"},
+        {"label": "{weekday}", "insert": "{weekday}"},
+        {"label": "{date:M/d}（{weekday:short}）", "insert": "{date:M/d}（{weekday:short}）"}
+      ]
+    },
+    {
+      "name": "時間",
+      "items": [
+        {"label": "{time:HH:mm}", "insert": "{time:HH:mm}"},
+        {"label": "{time:HH:mm:ss}", "insert": "{time:HH:mm:ss}"},
+        {"label": "{time:a h:mm}", "insert": "{time:a h:mm}"},
+        {"label": "{date:yyyy/MM/dd} {time:HH:mm}", "insert": "{date:yyyy/MM/dd} {time:HH:mm}"}
+      ]
+    }
+  ]
+}
