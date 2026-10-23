@@ -27,7 +27,7 @@ only = sys.argv[6:]
 
 MANIFEST_SCHEMA = 1
 MIN_APP_VERSION_CODE = 103  # 第一個會讀資料包的 App 版本
-MIN_APP_ONLINE_ONLY = 110   # 第一個支援「只能線上安裝」資料包的 App 版本
+MIN_APP_ONLINE_ONLY = 111   # 第一個支援「只能線上安裝」資料包的 App 版本
 
 packs = json.load(open(f"{root}/packs.json", encoding="utf-8"))["packs"]
 packs = [p for p in packs if p["id"] != "core" and (not only or p["id"] in only)]
