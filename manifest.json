@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "updated": "2026-10-23T10:28:27Z",
+  "updated": "2026-10-23T10:53:34Z",
   "packs": [
     {
       "id": "trendy",
       "group": "words",
       "name": "流行與口語用語",
-      "version": "2026.10.23.1800",
-      "rows": 154,
-      "size": 4367,
-      "sha256": "2dd561128b08dc199a33209d16e39cbd0f8920abc18709a3b805aa54506a3573",
-      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1800/trendy-2026.10.23.1800.db.gz",
+      "version": "2026.10.23.1902",
+      "rows": 148,
+      "size": 4220,
+      "sha256": "52885b84e730abad0735205f66b4095e09e6963867981d1445713b5b0c95759b",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1902/trendy-2026.10.23.1902.db.gz",
       "minAppVersion": 103
     },
     {
@@ -102,7 +102,6 @@
       "minAppVersion": 103
     }
   ],
-  "layouts": [],
   "plugins": [
     {
       "id": "datetime",
@@ -137,5 +136,6 @@
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1901/texttools-2026.10.23.1901.json",
       "minAppVersion": 105
     }
-  ]
+  ],
+  "layouts": []
 }
