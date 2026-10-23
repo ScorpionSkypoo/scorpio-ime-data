@@ -36,7 +36,11 @@ jobs:
 
       - name: 決定版本與資料包
         id: plan
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
+          # 排隊期間別的建置可能已經發佈過：先拿最新的 manifest
+          git pull --rebase origin main
           # 版本號用台灣時間；萬一 manifest 裡已有更大的版本（手動發佈過），就接在它後面，確保一定往上加
           V=$(TZ=Asia/Taipei date +%Y.%m.%d.%H%M)
           V=$(python3 - "$V" <<'PY'
@@ -52,6 +56,10 @@ jobs:
           print(v)
           PY
           )
+          # 同一分鐘已經有 Release 就往上加
+          while gh release view "packs-$V" > /dev/null 2>&1; do
+            V="${V%.*}.$(( ${V##*.} + 1 ))"
+          done
           echo "version=$V" >> "$GITHUB_OUTPUT"
           if [ -n "${{ github.event.inputs.packs }}" ]; then
             P="${{ github.event.inputs.packs }}"
@@ -89,6 +97,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add manifest.json
           git commit -m "資料包 $V：${{ steps.plan.outputs.packs }}"
+          git pull --rebase origin main
           git push
         env:
           GH_TOKEN: ${{ github.token }}
