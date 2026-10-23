@@ -1,16 +1,16 @@
 {
   "schema": 1,
-  "updated": "2026-10-23T11:14:05Z",
+  "updated": "2026-10-23T11:28:49Z",
   "packs": [
     {
       "id": "trendy",
       "group": "words",
       "name": "流行與口語用語",
-      "version": "2026.10.23.1913",
+      "version": "2026.10.23.1928",
       "rows": 186,
-      "size": 5339,
-      "sha256": "9ee275b39ceb48071e3aad38465e3af2860ad8e9564cce854cbc3b91180c9616",
-      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1913/trendy-2026.10.23.1913.db.gz",
+      "size": 5338,
+      "sha256": "7b825dd22abb90a4a6f78cb160737d8cbc7cbc8fa91afe00f7d34607e3280203",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1928/trendy-2026.10.23.1928.db.gz",
       "minAppVersion": 103,
       "description": "網路流行語、社群用語與日常口語搭配，每年更新",
       "source": "人工整理（tools/data/trendy.txt）",
