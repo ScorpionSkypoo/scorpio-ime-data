@@ -108,6 +108,29 @@
 
 - `id` 要跟檔名一樣；`language`（BCP 47 語言標籤）與 `languageName` 決定設定頁「新增輸入法」裡分在哪個語言底下；`spaceLabel` 是空白鍵上的字；`sort` 決定設定頁與切換的順序（小的在前）。
 - `requires`（選填）列出這個版面要用的資料包 id（要在 `packs.json` 裡），App 會先下載好資料包再裝上版面。
+
+### 字鍵排（schema 2，選填）
+
+沒寫 `keys` 的版面用內建的 QWERTY。要換字鍵的排法（例如 Dvorak），寫 `"schema": 2`、`keys`，另外要寫 `minAppVersion`（第一個看得懂 `keys` 的 App versionCode，舊版 App 會整個不收這個版面）。最下排（符號、逗號、地球、空白、句號、Enter）固定由 App 畫，不能改。
+
+```json
+"keys": {
+  "columns": 10,
+  "numberRow": "1234567890",
+  "rows": [
+    "pyfgcrl",
+    "aoeuidhtns",
+    ["qjkxbmwvz", {"special": "backspace"}]
+  ]
+}
+```
+
+- `columns`：10～12 欄（預設 10），一欄＝鍵盤寬 ÷ 欄數。`numberRow`（選填）只能是數字。
+- `rows`：1～4 排。每排可以是字串（一個字一鍵），或陣列：字串是一串字鍵、`{"key":"x","width":1.5}` 是一個字鍵（寬 1～2 欄）、`{"special":"shift"}`／`{"special":"backspace"}` 是 Shift／刪除鍵（至少 1 欄；沒寫 `width` 就平分這排剩下的寬度）。
+- 每排加起來不能超過 `columns`，不足的部分左右平分留空；刪除鍵剛好一個、Shift 最多一個；同一個字只能出現一次，`* : ;` 與空白不能當字鍵。
+- 目前的打字方式都用英文字母，所以字鍵要剛好是 a–z 各一次。
+- 按鍵落點學習依鍵位分組：鍵位跟內建 QWERTY 一樣的版面共用原本的學習資料；鍵位不同的另外學，版面改版時 App 會依位置把舊的習慣搬過去。
+- 不合規則的版面 `make_layouts.py` 會直接失敗，App 端也會拒收。
 - App 不認得的 `engine` 會略過，所以之後新增打字方式不會讓舊版 App 出錯。
 - 推上 main 後，[`packs.yml`](.github/workflows/packs.yml) 會驗證格式並發佈有改到的版面；已安裝的使用者隔天自動更新。
 
