@@ -3,38 +3,76 @@
   "id": "datetime",
   "name": "日期時間",
   "icon": "calendar",
-  "description": "插入今天的日期、現在時間、星期",
+  "description": "插入今天、明天等日期，現在時間與星期",
+  "minAppVersion": 136,
   "tabs": [
     {
       "name": "日期",
       "items": [
         {
+          "title": "今天",
+          "label": "{date:M月d日}（{weekday:short}）",
+          "insert": "{date:M月d日}（{weekday:short}）"
+        },
+        {
+          "title": "明天",
+          "label": "{date+1:M月d日}（{weekday+1:short}）",
+          "insert": "{date+1:M月d日}（{weekday+1:short}）"
+        },
+        {
+          "title": "後天",
+          "label": "{date+2:M月d日}（{weekday+2:short}）",
+          "insert": "{date+2:M月d日}（{weekday+2:short}）"
+        },
+        {
+          "title": "昨天",
+          "label": "{date-1:M月d日}（{weekday-1:short}）",
+          "insert": "{date-1:M月d日}（{weekday-1:short}）"
+        },
+        {
+          "title": "今天",
           "label": "{date:yyyy/MM/dd}",
           "insert": "{date:yyyy/MM/dd}"
         },
         {
+          "title": "今天",
           "label": "{date:yyyy-MM-dd}",
           "insert": "{date:yyyy-MM-dd}"
         },
         {
-          "label": "{date:M月d日}",
-          "insert": "{date:M月d日}"
-        },
-        {
+          "title": "今天",
           "label": "{date:yyyy年M月d日}",
           "insert": "{date:yyyy年M月d日}"
         },
         {
+          "title": "今天（民國）",
           "label": "民國{roc}年{date:M月d日}",
           "insert": "民國{roc}年{date:M月d日}"
-        },
+        }
+      ]
+    },
+    {
+      "name": "星期",
+      "items": [
         {
+          "title": "今天",
           "label": "{weekday}",
           "insert": "{weekday}"
         },
         {
+          "title": "明天",
+          "label": "{weekday+1}",
+          "insert": "{weekday+1}"
+        },
+        {
+          "title": "今天",
           "label": "{date:M/d}（{weekday:short}）",
           "insert": "{date:M/d}（{weekday:short}）"
+        },
+        {
+          "title": "明天",
+          "label": "{date+1:M/d}（{weekday+1:short}）",
+          "insert": "{date+1:M/d}（{weekday+1:short}）"
         }
       ]
     },
@@ -42,20 +80,24 @@
       "name": "時間",
       "items": [
         {
+          "title": "現在",
           "label": "{time:HH:mm}",
           "insert": "{time:HH:mm}"
         },
         {
-          "label": "{time:HH:mm:ss}",
-          "insert": "{time:HH:mm:ss}"
-        },
-        {
+          "title": "現在",
           "label": "{time:a h:mm}",
           "insert": "{time:a h:mm}"
         },
         {
-          "label": "{date:yyyy/MM/dd} {time:HH:mm}",
-          "insert": "{date:yyyy/MM/dd} {time:HH:mm}"
+          "title": "現在",
+          "label": "{time:HH:mm:ss}",
+          "insert": "{time:HH:mm:ss}"
+        },
+        {
+          "title": "現在",
+          "label": "{date:M/d} {time:HH:mm}",
+          "insert": "{date:M/d} {time:HH:mm}"
         }
       ]
     }

@@ -51,7 +51,7 @@
 
 | 動作 | 說明 | 欄位 |
 |---|---|---|
-| `insert`（預設） | 插入文字 | `insert`：可用 `{date:格式}`、`{time:格式}`（Java SimpleDateFormat）、`{weekday}`、`{weekday:short}`、`{roc}`（民國年）、`{selection}` |
+| `insert`（預設） | 插入文字 | `insert`：可用 `{date:格式}`、`{time:格式}`（Java SimpleDateFormat）、`{weekday}`、`{weekday:short}`、`{roc}`（民國年）、`{selection}`；`date`、`weekday`、`roc` 可加天數，例如 `{date+1:M/d}` 是明天、`{weekday-1}` 是昨天星期幾（App versionCode 136 起） |
 | `transform` | 轉換選取的文字 | `op`：`fullwidth`、`halfwidth`、`upper`、`lower`、`title`、`trim_spaces` |
 | `open_url` | 用選取的文字開網址 | `url`：只接受 `https://`，`{selection}` 會先做 URL 編碼 |
 
@@ -72,6 +72,8 @@
 ```
 
 - 項目直接寫字串，等於「顯示這段、插入這段」。`label` 也會展開日期標記，面板上看得到實際會插入什麼。
+- 項目可加 `title`：面板上顯示在內容上方的小標題（例如「今天」「明天」），一樣會展開標記（App versionCode 136 起）。
+- 用到新功能的外掛要寫 `minAppVersion`（App 的 versionCode），舊版 App 就不會裝到看不懂的版本。
 - `id` 要跟檔名一樣。`icon` 是工具列上的圖示，從 App 內建的向量圖示選一個：`calendar`、`symbols`、`text`、`search`、`star`、`note`、`link`、`clipboard`。
 - App 不認得的動作會略過，所以之後新增動作不會讓舊版 App 出錯。
 - 推上 main 後，[`packs.yml`](.github/workflows/packs.yml) 會驗證格式並發佈有改到的外掛；已安裝的使用者隔天自動更新。

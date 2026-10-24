@@ -72,7 +72,8 @@ for name in sorted(os.listdir(f"{root}/plugins")):
         "size": len(blob),
         "sha256": hashlib.sha256(blob).hexdigest(),
         "url": f"{base_url}/{fname}",
-        "minAppVersion": MIN_APP_VERSION_CODE,
+        # 用到新版 App 才有的功能（例如 {date+1:…}、title）的外掛自己寫 minAppVersion
+        "minAppVersion": max(MIN_APP_VERSION_CODE, p.get("minAppVersion", 0)),
     }
     print(f"外掛 {p['id']} {version}：{len(blob)} bytes")
 
