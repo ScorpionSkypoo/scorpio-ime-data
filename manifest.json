@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-23T16:00:35Z",
+  "updated": "2026-10-24T03:35:38Z",
   "packs": [
     {
       "id": "trendy",
@@ -185,5 +185,72 @@
       "minAppVersion": 105
     }
   ],
-  "layouts": []
+  "layouts": [
+    {
+      "id": "hsu",
+      "name": "注音（許氏）",
+      "description": "許氏 26 鍵：一個鍵代表一到兩個注音，自動判斷。",
+      "version": "2026.10.24.1135",
+      "size": 276,
+      "sha256": "50c5e57b70c7b8609aa9be54b71fe4c32672904d9deaf4730f6523dc73cd0fb4",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.24.1135/hsu-2026.10.24.1135.json",
+      "minAppVersion": 134,
+      "requires": []
+    },
+    {
+      "id": "eten26",
+      "name": "注音（倚天 26 鍵）",
+      "description": "倚天 26 鍵：一個鍵代表一到兩個注音，自動判斷。",
+      "version": "2026.10.24.1135",
+      "size": 286,
+      "sha256": "4539649b1fd791d2996d52fdabddc72750df120a3fe0dd9d7d0f74f5becc0135",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.24.1135/eten26-2026.10.24.1135.json",
+      "minAppVersion": 134,
+      "requires": []
+    },
+    {
+      "id": "dachen26",
+      "name": "注音（大千 26 鍵）",
+      "description": "大千 26 鍵：大千的位置壓縮到 26 個字母鍵。",
+      "version": "2026.10.24.1135",
+      "size": 282,
+      "sha256": "3ec8767f2c395b2f5a4744bde8f8080361ef1667f79253216bceaa9ac8ba24b2",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.24.1135/dachen26-2026.10.24.1135.json",
+      "minAppVersion": 134,
+      "requires": []
+    },
+    {
+      "id": "pinyin",
+      "name": "漢語拼音",
+      "description": "用英文字母打漢語拼音（zhong → 中），可只打聲母（kbd → 看不到）。",
+      "version": "2026.10.24.1135",
+      "size": 236,
+      "sha256": "20d5c2f5c7df6ecb23a8fd1272a32a0b0b9511e1f99af4bcafd853409ab72a93",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.24.1135/pinyin-2026.10.24.1135.json",
+      "minAppVersion": 134,
+      "requires": []
+    },
+    {
+      "id": "cangjie",
+      "name": "倉頡",
+      "description": "倉頡碼（Unicode 倉頡第三代），最多 5 碼，打一半就會列出常用字。",
+      "version": "2026.10.24.1135",
+      "size": 228,
+      "sha256": "1346b5ccdcee3ae85b9f93058c88026214bf99d0b6fa325eb431e94fe4995b81",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.24.1135/cangjie-2026.10.24.1135.json",
+      "minAppVersion": 134,
+      "requires": []
+    },
+    {
+      "id": "quick",
+      "name": "速成",
+      "description": "速成：只打倉頡碼的第一碼和最後一碼，依常用程度排序。",
+      "version": "2026.10.24.1135",
+      "size": 213,
+      "sha256": "f890a743a839bbed8356cedcb39c480e1db34a4973a37daa94ae02318a22f91c",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.24.1135/quick-2026.10.24.1135.json",
+      "minAppVersion": 134,
+      "requires": []
+    }
+  ]
 }
