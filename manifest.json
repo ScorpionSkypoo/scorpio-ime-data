@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-24T03:35:38Z",
+  "updated": "2026-10-24T03:46:45Z",
   "packs": [
     {
       "id": "trendy",
@@ -155,12 +155,12 @@
       "id": "datetime",
       "name": "日期時間",
       "icon": "calendar",
-      "description": "插入今天的日期、現在時間、星期",
-      "version": "2026.10.23.1901",
-      "size": 918,
-      "sha256": "ab1badf05f0539d134bbaeaf4d5850a42815b028a086e610d867e4cfda1128b8",
-      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23.1901/datetime-2026.10.23.1901.json",
-      "minAppVersion": 105
+      "description": "插入今天、明天等日期，現在時間與星期",
+      "version": "2026.10.24.1146",
+      "size": 1744,
+      "sha256": "94b6e20aa4e25ce3f3127316c396603929035246d02472708541b80d0501825a",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.24.1146/datetime-2026.10.24.1146.json",
+      "minAppVersion": 136
     },
     {
       "id": "symbols",
