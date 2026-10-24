@@ -2,6 +2,8 @@
   "schema": 1,
   "id": "quick",
   "name": "速成",
+  "language": "zh-TW",
+  "languageName": "中文（台灣）",
   "spaceLabel": "速成",
   "description": "速成：只打倉頡碼的第一碼和最後一碼，依常用程度排序。",
   "engine": "quick",

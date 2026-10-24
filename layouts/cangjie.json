@@ -2,6 +2,8 @@
   "schema": 1,
   "id": "cangjie",
   "name": "倉頡",
+  "language": "zh-TW",
+  "languageName": "中文（台灣）",
   "spaceLabel": "倉頡",
   "description": "倉頡碼（Unicode 倉頡第三代），最多 5 碼，打一半就會列出常用字。",
   "engine": "cangjie",

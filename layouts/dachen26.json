@@ -2,6 +2,8 @@
   "schema": 1,
   "id": "dachen26",
   "name": "注音（大千 26 鍵）",
+  "language": "zh-TW",
+  "languageName": "中文（台灣）",
   "spaceLabel": "注音·大千26",
   "description": "大千 26 鍵：大千的位置壓縮到 26 個字母鍵。",
   "engine": "zhuyin26",

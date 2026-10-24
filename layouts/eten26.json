@@ -2,6 +2,8 @@
   "schema": 1,
   "id": "eten26",
   "name": "注音（倚天 26 鍵）",
+  "language": "zh-TW",
+  "languageName": "中文（台灣）",
   "spaceLabel": "注音·倚天",
   "description": "倚天 26 鍵：一個鍵代表一到兩個注音，自動判斷。",
   "engine": "zhuyin26",

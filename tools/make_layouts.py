@@ -27,7 +27,7 @@ MIN_APP_VERSION_CODE = 134
 
 def validate(p, path, pack_ids):
     assert p.get("schema", 1) <= SCHEMA, f"{path}：schema 太新"
-    for key in ("id", "name", "engine"):
+    for key in ("id", "name", "engine", "language", "languageName"):
         assert key in p, f"{path}：缺少 {key}"
     assert p["id"] == os.path.basename(path)[:-5], f"{path}：id 要跟檔名一樣"
     assert p["id"] != "dachen", f"{path}：大千注音內建在 App"
@@ -69,6 +69,9 @@ for name in sorted(os.listdir(f"{root}/layouts")):
         "url": f"{base_url}/{fname}",
         "minAppVersion": MIN_APP_VERSION_CODE,
         "requires": p.get("requires", []),
+        # 設定頁先選語言再選版面
+        "language": p["language"],
+        "languageName": p["languageName"],
     }
     print(f"版面 {p['id']} {version}：{len(blob)} bytes")
 

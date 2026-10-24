@@ -96,6 +96,8 @@
   "schema": 1,
   "id": "hsu",
   "name": "注音（許氏）",
+  "language": "zh-TW",
+  "languageName": "中文（台灣）",
   "spaceLabel": "注音·許氏",
   "description": "許氏 26 鍵：一個鍵代表一到兩個注音，自動判斷。",
   "engine": "zhuyin26",
@@ -104,7 +106,7 @@
 }
 ```
 
-- `id` 要跟檔名一樣；`spaceLabel` 是空白鍵上的字；`sort` 決定設定頁與切換的順序（小的在前）。
+- `id` 要跟檔名一樣；`language`（BCP 47 語言標籤）與 `languageName` 決定設定頁「新增輸入法」裡分在哪個語言底下；`spaceLabel` 是空白鍵上的字；`sort` 決定設定頁與切換的順序（小的在前）。
 - `requires`（選填）列出這個版面要用的資料包 id（要在 `packs.json` 裡），App 會先下載好資料包再裝上版面。
 - App 不認得的 `engine` 會略過，所以之後新增打字方式不會讓舊版 App 出錯。
 - 推上 main 後，[`packs.yml`](.github/workflows/packs.yml) 會驗證格式並發佈有改到的版面；已安裝的使用者隔天自動更新。
