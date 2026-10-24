@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 重建指定的資料包並更新 manifest.json
 #
-# 用法：tools/build.sh <工作目錄> <版本> <資料包或外掛 id...>
+# 用法：tools/build.sh <工作目錄> <版本> <資料包、外掛或版面 id...>
 #   例：tools/build.sh work 2026.10.23 trendy
 #       tools/build.sh work 2026.10.23 bg_wiki bg_ptt bg_dcard   （先跑 tools/fetch_corpus.sh work/corpus）
 #   工作目錄/raw     附加詞庫原始資料（缺的來源保留 base 裡原本的詞）
@@ -50,10 +50,12 @@ for s in sources:
     db.execute("DETACH src")
 PYEOF
 
-# 外掛（plugins/<id>.json）與資料包分開處理
-DATA="" PLUGINS=""
+# 外掛（plugins/<id>.json）、鍵盤版面（layouts/<id>.json）與資料包分開處理
+DATA="" PLUGINS="" LAYOUTS=""
 for s in $PACKS; do
-  if [ -f "$R/plugins/$s.json" ]; then PLUGINS="$PLUGINS $s"; else DATA="$DATA $s"; fi
+  if [ -f "$R/plugins/$s.json" ]; then PLUGINS="$PLUGINS $s"
+  elif [ -f "$R/layouts/$s.json" ]; then LAYOUTS="$LAYOUTS $s"
+  else DATA="$DATA $s"; fi
 done
 if [ -n "$DATA" ]; then
   "$PY" -I "$R/tools/make_packs.py" "$W/dict.db" "$W/bigram.db" "$W/out" "$V" \
@@ -61,6 +63,9 @@ if [ -n "$DATA" ]; then
 fi
 if [ -n "$PLUGINS" ]; then
   "$PY" -I "$R/tools/make_plugins.py" "$W/out" "$V" "https://github.com/$REPO/releases/download/packs-$V" $PLUGINS
+fi
+if [ -n "$LAYOUTS" ]; then
+  "$PY" -I "$R/tools/make_layouts.py" "$W/out" "$V" "https://github.com/$REPO/releases/download/packs-$V" $LAYOUTS
 fi
 # 新的 base（給下一次建置與 App 打包用）
 mkdir -p "$W/base" "$W/scd"

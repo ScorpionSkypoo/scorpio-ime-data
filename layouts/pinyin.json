@@ -1,0 +1,9 @@
+{
+  "schema": 1,
+  "id": "pinyin",
+  "name": "漢語拼音",
+  "spaceLabel": "拼音",
+  "description": "用英文字母打漢語拼音（zhong → 中），可只打聲母（kbd → 看不到）。",
+  "engine": "pinyin",
+  "sort": 40
+}

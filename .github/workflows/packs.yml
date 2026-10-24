@@ -1,11 +1,11 @@
 name: 建置並發佈資料包
 
-# sources/、packs.json 有變動（例如新詞雷達的 PR 合併）就重建流行用語；plugins/ 有變動就重建改到的外掛；
-# 也可以手動執行，指定要重建的資料包或外掛（接續詞語料會先下載約 750 MB 的語料）
+# sources/、packs.json 有變動（例如新詞雷達的 PR 合併）就重建流行用語；plugins/、layouts/ 有變動就重建改到的外掛、版面；
+# 也可以手動執行，指定要重建的資料包、外掛或版面（接續詞語料會先下載約 750 MB 的語料）
 on:
   push:
     branches: [main]
-    paths: ["sources/**", "packs.json", "plugins/**"]
+    paths: ["sources/**", "packs.json", "plugins/**", "layouts/**"]
   workflow_dispatch:
     inputs:
       packs:
@@ -48,7 +48,7 @@ jobs:
           v = sys.argv[1]
           key = lambda s: [int(x) for x in s.split(".")]
           m = json.load(open("manifest.json"))
-          top = max((e["version"] for e in m.get("packs", []) + m.get("plugins", [])), key=key, default="0")
+          top = max((e["version"] for e in m.get("packs", []) + m.get("plugins", []) + m.get("layouts", [])), key=key, default="0")
           if key(top) >= key(v):
               parts = key(top)
               parts[-1] += 1
@@ -67,7 +67,7 @@ jobs:
             CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
             P=""
             echo "$CHANGED" | grep -qE '^(sources/|packs.json)' && P="trendy"
-            for f in $(echo "$CHANGED" | grep -E '^plugins/.+\.json$'); do
+            for f in $(echo "$CHANGED" | grep -E '^(plugins|layouts)/.+\.json$'); do
               [ -f "$f" ] && P="$P $(basename "$f" .json)"
             done
           fi

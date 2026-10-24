@@ -41,7 +41,7 @@
 }
 ```
 
-`minAppVersion` 是能套用這個資料包的最低 App versionCode。`plugins` 是工具列擴充功能（見下面），`layouts` 預留給之後的鍵盤版面、符號版面。
+`minAppVersion` 是能套用這個資料包的最低 App versionCode。`plugins` 是工具列擴充功能、`layouts` 是鍵盤版面（都見下面）。
 
 ## 擴充功能（工具列外掛）
 
@@ -75,6 +75,37 @@
 - `id` 要跟檔名一樣。`icon` 是工具列上的圖示，從 App 內建的向量圖示選一個：`calendar`、`symbols`、`text`、`search`、`star`、`note`、`link`、`clipboard`。
 - App 不認得的動作會略過，所以之後新增動作不會讓舊版 App 出錯。
 - 推上 main 後，[`packs.yml`](.github/workflows/packs.yml) 會驗證格式並發佈有改到的外掛；已安裝的使用者隔天自動更新。
+
+## 鍵盤版面
+
+`layouts/<id>.json`，在 App「設定 → 輸入法」線上安裝，裝好後就能用地球鍵切換。大千注音內建在 App，不在這裡；其他版面都用 QWERTY 鍵盤，鍵上標該版面的符號。
+
+版面也是**宣告式**的：只能選 App 內建的打字方式（`engine`），不含程式碼。
+
+| engine | 說明 | 欄位 |
+|---|---|---|
+| `zhuyin26` | 26 鍵注音（一個鍵代表一到兩個注音，自動判斷） | `keymap`：41 個小寫字母，依序對應 ㄅ…ㄙ、ㄧㄨㄩ、ㄚ…ㄦ、˙ˊˇˋ（跟 libchewing `key2pho.c` 同格式） |
+| `pinyin` | 漢語拼音 | — |
+| `cangjie` | 倉頡（碼表內建在 App） | — |
+| `quick` | 速成 | — |
+
+```json
+{
+  "schema": 1,
+  "id": "hsu",
+  "name": "注音（許氏）",
+  "spaceLabel": "注音·許氏",
+  "description": "許氏 26 鍵：一個鍵代表一到兩個注音，自動判斷。",
+  "engine": "zhuyin26",
+  "keymap": "bpmfdtnlgkhjvcjvcrzasexuyhgeiawomnkllsdfj",
+  "sort": 10
+}
+```
+
+- `id` 要跟檔名一樣；`spaceLabel` 是空白鍵上的字；`sort` 決定設定頁與切換的順序（小的在前）。
+- `requires`（選填）列出這個版面要用的資料包 id（要在 `packs.json` 裡），App 會先下載好資料包再裝上版面。
+- App 不認得的 `engine` 會略過，所以之後新增打字方式不會讓舊版 App 出錯。
+- 推上 main 後，[`packs.yml`](.github/workflows/packs.yml) 會驗證格式並發佈有改到的版面；已安裝的使用者隔天自動更新。
 
 ## 新詞雷達
 

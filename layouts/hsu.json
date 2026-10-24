@@ -1,0 +1,10 @@
+{
+  "schema": 1,
+  "id": "hsu",
+  "name": "注音（許氏）",
+  "spaceLabel": "注音·許氏",
+  "description": "許氏 26 鍵：一個鍵代表一到兩個注音，自動判斷。",
+  "engine": "zhuyin26",
+  "keymap": "bpmfdtnlgkhjvcjvcrzasexuyhgeiawomnkllsdfj",
+  "sort": 10
+}
