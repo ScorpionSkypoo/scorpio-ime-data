@@ -189,6 +189,11 @@ tools/build.sh work 2026.10.23 trendy bg_ptt  # 產出 work/out（資料包）�
 
 基底詞庫（`base/`，主詞庫＋目前所有資料）放在 Release `base`，App repo 打包時也從這裡取用。
 
+### 台灣生活用語
+
+[`sources/tw_life.txt`](sources/tw_life.txt)：主詞庫沒有的常用詞（免運、截圖、貼文、按讚、執行緒…），人工整理，來源寫在檔案開頭。
+新詞候選用 `tools/mine_new_words.py`（PTT、Dcard 等大語料的新詞發現，同 `radar/discover.py` 的判斷方式）找，看過再加。
+
 ### 口語詞頻
 
 小麥注音的詞頻來自書面語料，秒殺、手環、咖哩飯這類生活詞分數很低。`tools/build.sh` 每次建置都會用

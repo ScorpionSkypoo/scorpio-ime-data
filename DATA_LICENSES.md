@@ -36,6 +36,16 @@
 | Dcard | Hugging Face [iddle/dcard_conversations](https://huggingface.co/datasets/iddle/dcard_conversations) | MIT License |
 | 流行與口語用語 | 本專案人工整理（`sources/trendy.txt` 的 `[pairs]`） | MIT License（同本專案） |
 
+## 台灣生活用語
+
+[`sources/tw_life.txt`](sources/tw_life.txt) 是人工整理的詞表（每個詞都看過），來源：
+
+| 來源 | 原始資料 | 授權 |
+|---|---|---|
+| taiwan-md 兩岸用語對照（台灣說法） | [frank890417/taiwan-md](https://github.com/frank890417/taiwan-md) `data/terminology` | CC BY-SA 4.0 |
+| OpenCC 台灣詞語 | [BYVoid/OpenCC](https://github.com/BYVoid/OpenCC) `data/dictionary/TWPhrases.txt` | Apache License 2.0 |
+| 語料裡常出現的新詞 | 上表的 PTT、Dcard 語料與 taiwan-md 文章（CC BY-SA 4.0），`tools/mine_new_words.py` 挑候選後人工選 | 同各語料 |
+
 ## 口語詞頻
 
 [`sources/colloquial_counts.tsv`](sources/colloquial_counts.tsv) 只存「詞 → 在語料裡出現幾次」，不含原文；來源是上表的 PTT 與 Dcard 語料（授權同上表）。

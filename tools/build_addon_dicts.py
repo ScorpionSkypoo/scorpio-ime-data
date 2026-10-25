@@ -10,6 +10,7 @@
   - Wikidata 人口 40 萬以上城市、地標與地理 cities.csv、landmarks.csv（CC0）
   - 國家教育研究院「電子計算機學術名詞」naer_cs_terms.csv（政府資料開放授權條款第 1 版）
   - 教育部《重編國語辭典修訂本》dict-revised.json（g0v moedict-data，CC BY-ND 3.0 台灣）
+  - 人工整理的台灣生活用語 sources/tw_life.txt（來源見檔案開頭：taiwan-md 用語對照、OpenCC、語料新詞）
 
 讀音以主詞庫推得：詞內能對到主詞庫的多字詞就用它的讀音（破音字跟著詞走），其餘單字取最常用讀音；
 有主詞庫沒有的字就整個略過。主詞庫已有同字同讀音的詞不重複收錄。
@@ -231,6 +232,16 @@ if have("dict-revised.json"):
             if len(syl) == len(w) and all(BOPO.match(x) for x in syl):
                 add(w, -6.6, "moe_dict", "-".join(syl))
                 break
+
+# 7. 台灣生活用語：主詞庫沒有的常用詞（免運、截圖、貼文、按讚…）；分數先給冷門詞的程度，
+#    tools/apply_colloquial.py 會照口語語料的次數把常用的拉上來
+for line in open(f"{root}/sources/tw_life.txt", encoding="utf-8"):
+    line = line.strip()
+    if not line or line.startswith(("#", "[")):
+        continue
+    f = line.split()
+    add(f[0], -6.4, "tw_life", f[1] if len(f) > 1 else None)
+built.add("tw_life")
 
 db.execute("CREATE TABLE IF NOT EXISTS addon_dict (reading TEXT NOT NULL, toneless TEXT NOT NULL, word TEXT NOT NULL, score REAL NOT NULL, "
            "initials TEXT NOT NULL, finals TEXT NOT NULL, source TEXT NOT NULL)")

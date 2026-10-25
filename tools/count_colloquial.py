@@ -33,7 +33,7 @@ con = sqlite3.connect(dict_db)
 uni = {}
 for table in ("dict", "addon_dict"):
     cols = [r[1] for r in con.execute(f"PRAGMA table_info({table})")]
-    col = "base_score" if "base_score" in cols else "score"
+    col = "COALESCE(base_score, score)" if "base_score" in cols else "score"
     for w, s in con.execute(f"SELECT word, MAX({col}) FROM {table} GROUP BY word"):
         if w and not w.startswith("MACRO@") and all('一' <= ch <= '鿿' for ch in w):
             uni[w] = max(s, uni.get(w, -99))

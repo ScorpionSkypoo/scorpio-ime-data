@@ -24,6 +24,17 @@
       "category": "basic"
     },
     {
+      "id": "tw_life",
+      "group": "words",
+      "name": "台灣生活用語",
+      "description": "主詞庫沒有的常用詞：網購、遊戲、美妝、美食、科技譯名等（免運、截圖、貼文、按讚、執行緒）",
+      "source": "人工整理：taiwan-md 兩岸用語對照、OpenCC 台灣詞語、PTT 與 Dcard 常用新詞（sources/tw_life.txt）",
+      "license": "CC BY-SA 4.0（taiwan-md）、Apache License 2.0（OpenCC）",
+      "url": "https://github.com/frank890417/taiwan-md",
+      "version": "2026.10",
+      "category": "basic"
+    },
+    {
       "id": "tw_places",
       "group": "words",
       "name": "台灣地名與路名",
