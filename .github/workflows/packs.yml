@@ -5,7 +5,7 @@ name: 建置並發佈資料包
 on:
   push:
     branches: [main]
-    paths: ["sources/**", "packs.json", "plugins/**", "layouts/**"]
+    paths: ["sources/**", "packs.json", "plugins/**", "layouts/**", "config/**"]
   workflow_dispatch:
     inputs:
       packs:
@@ -67,7 +67,7 @@ jobs:
             CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
             P=""
             echo "$CHANGED" | grep -qE '^(sources/|packs.json)' && P="trendy"
-            for f in $(echo "$CHANGED" | grep -E '^(plugins|layouts)/.+\.json$'); do
+            for f in $(echo "$CHANGED" | grep -E '^(plugins|layouts|config)/.+\.json$'); do
               [ -f "$f" ] && P="$P $(basename "$f" .json)"
             done
           fi

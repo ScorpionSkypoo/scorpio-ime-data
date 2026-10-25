@@ -3,6 +3,7 @@
 #
 # 用法：tools/build.sh <工作目錄> <版本> <資料包、外掛或版面 id...>
 #   例：tools/build.sh work 2026.10.23 trendy
+#       tools/build.sh work 2026.10.23 ime     （鍵盤設定 config/ime.json：簡拼展開、顏文字對照、讀音混用預設、符號鍵盤）
 #       tools/build.sh work 2026.10.23 emoji   （App 內建的資料：core 主詞庫、emoji、en 英文、cangjie_table 倉頡碼表，發佈成線上更新、一併更新 base）
 #       tools/build.sh work 2026.10.23 bg_wiki bg_ptt bg_dcard   （先跑 tools/fetch_corpus.sh work/corpus）
 #   工作目錄/raw     附加詞庫原始資料（缺的來源保留 base 裡原本的詞）
@@ -57,9 +58,10 @@ for s in sources:
 PYEOF
 
 # 外掛（plugins/<id>.json）、鍵盤版面（layouts/<id>.json）與資料包分開處理
-DATA="" PLUGINS="" LAYOUTS=""
+DATA="" PLUGINS="" LAYOUTS="" CONFIGS=""
 for s in $PACKS; do
-  if [ -f "$R/plugins/$s.json" ]; then PLUGINS="$PLUGINS $s"
+  if [ -f "$R/config/$s.json" ]; then CONFIGS="$CONFIGS $s"
+  elif [ -f "$R/plugins/$s.json" ]; then PLUGINS="$PLUGINS $s"
   elif [ -f "$R/layouts/$s.json" ]; then LAYOUTS="$LAYOUTS $s"
   else DATA="$DATA $s"; fi
 done
@@ -73,8 +75,11 @@ fi
 if [ -n "$LAYOUTS" ]; then
   "$PY" -I "$R/tools/make_layouts.py" "$W/out" "$V" "https://github.com/$REPO/releases/download/packs-$V" $LAYOUTS
 fi
-# 新的 base（給下一次建置與 App 打包用）
 mkdir -p "$W/base" "$W/scd"
+if [ -n "$CONFIGS" ]; then
+  "$PY" -I "$R/tools/make_configs.py" "$W/dict.db" "$W/out" "$W/base" "$V" "https://github.com/$REPO/releases/download/packs-$V" $CONFIGS
+fi
+# 新的 base（給下一次建置與 App 打包用）
 gzip -9 -n -c "$W/dict.db" > "$W/base/scorpio_dict.db.gz"
 gzip -9 -n -c "$W/bigram.db" > "$W/base/scorpio_bigram.db.gz"
 # App 內建的 SCD 詞庫（只放內建的資料包；版本是各資料包最後發佈的那版）

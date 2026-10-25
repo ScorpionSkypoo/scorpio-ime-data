@@ -29,6 +29,17 @@ App 內建、一律使用的資料也能線上更新（manifest 標 `"system": t
 
 例：Unicode 出新版 Emoji 時，換掉 `emoji/` 的兩個檔，手動執行「建置並發佈資料包」填 `emoji`。
 
+## 鍵盤設定
+
+[`config/ime.json`](config/ime.json) 是跟著資料更新的鍵盤設定（App versionCode 170 起），改了推上 main 就會自動建置發佈，手機每天檢查時套用：
+
+- `lazySyllables`：只打聲母或介音時展開成哪些音節（`"ㄨ": ["ㄨㄛ", …]`，越前面越常用）
+- `kaomojiKeywords`：候選詞是這些詞時穿插哪一類顏文字（分類名稱要是顏文字資料包裡有的）
+- `fuzzyPriors`：讀音混用的預設比例（鍵是「打的注音＋想打的注音」，ㄣ／ㄥ 前面是 ㄧ 時加 `i`；每個人會照自己的選字調整）
+- `symbols`：符號鍵盤，`zh` 是從中文切過來、`en` 是從英文，每頁兩排各 10 個、第三排 7 個
+
+`tools/make_configs.py` 照 App 的規則檢查，不合就中止、不發佈。
+
 `packs.json` 的 `bundled: false` 表示 App 不內建、只能在「字典與學習 → 可下載的詞庫」打開開關下載；`default: false` 表示預設不開。
 
 每個資料包是 gzip 壓縮的 SCD 二進位詞庫（`<id>-<版本>.scd.gz`），放在 Release `packs-<版本>`；App 解壓後直接 mmap 查詢，不經 SQLite。版本號是建置時間（`2026.10.23.1530`），App 逐段比數字大小。格式見 [`docs/scd-format.md`](docs/scd-format.md)、[`tools/scd.py`](tools/scd.py)；建置用的 SQLite 基底詞庫（Release `base` 的 `scorpio_*.db.gz`）轉成 SCD 的流程在 [`tools/build_scd.py`](tools/build_scd.py)、[`tools/make_packs.py`](tools/make_packs.py)，`tools/verify_scd.py` 會逐鍵比對 SCD 與 SQLite 的查詢結果。
