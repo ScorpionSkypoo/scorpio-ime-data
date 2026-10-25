@@ -11,6 +11,11 @@
 整批換成口語詞頻（或同音詞照口語重排）試過：用使用者真實打字記錄 840 次選字重播，第一候選命中
 77.1% → 75.7～76.7%，口語比重越高越差（技術、書面詞被往後擠）；只拉冷門詞是 76.7%，換生活詞不再墊底。
 
+單字另外處理：同一個讀音（無聲調）裡的單字照口語次數重新分先後（各半混合），這個讀音的總量不變，
+所以不影響整句要切成長詞還是單字。小麥的單字字頻偏書面，ㄇㄚ 排「馬」不是「嗎」、ㄟ 排符號不是「欸」、
+ㄌㄚ 的「啦」輸「拉」。「阿」不調：PTT 常把「啊」寫成「阿」。用真實打字記錄 1,140 次選字重播：第一候選
+79.9% → 81.1%、前三 91.1% → 92.3%（口語占七成是 81.4%、92.1%，選比較保守的一半）。
+
 原本的分數存在 base_score 欄，每次都從原本的分數重算，重跑不會越疊越多（新加進來的詞 base_score 是空的，先補上）。
 
 用法：apply_colloquial.py <scorpio_dict.db（解壓後）> <colloquial_counts.tsv>
@@ -21,6 +26,9 @@ import sys
 from collections import defaultdict
 
 LAMBDA = 0.5
+# 單字同讀音重排：書面占的比例，跟不調的字（PTT 的習慣寫法）
+SINGLE_LAMBDA = 0.5
+SINGLE_EXCLUDE = set("阿")
 RARE = -6.0
 MIN_COUNT = 100
 MIN_GAIN = 1.0
@@ -60,11 +68,28 @@ for t in TABLES:
             word_mass[w] += 10 ** s
 scale = (sum(word_mass.values()) / Z) / (sum(c for w, c in counts.items() if w in word_mass) / total)
 
+# 單字：同讀音（無聲調）裡照口語次數重分，讀音的總量不變（多音字的次數照各讀音的書面比例分）
+singles = db.execute("SELECT rowid, word, base_score, toneless FROM dict WHERE length(word) = 1").fetchall()
+single_mass = defaultdict(float)
+for _, w, s, _ in singles:
+    single_mass[w] += 10 ** s
+by_reading = defaultdict(list)
+for rowid, w, s, tl in singles:
+    by_reading[tl].append((rowid, w, s))
+single_new = {}
+for tl, items in by_reading.items():
+    m = sum(10 ** s for _, _, s in items)
+    cm = sum(counts.get(w, 0) * 10 ** s / single_mass[w] for _, w, s in items if w not in SINGLE_EXCLUDE)
+    for rowid, w, s in items:
+        pw = 10 ** s / m
+        pc = pw if w in SINGLE_EXCLUDE or cm <= 0 else counts.get(w, 0) * 10 ** s / single_mass[w] / cm
+        single_new[rowid] = round(math.log10((SINGLE_LAMBDA * pw + (1 - SINGLE_LAMBDA) * pc) * m), 4)
+
 raised = 0
 for t in TABLES:
     upd = []
     for rowid, w, s in rows[t]:
-        new = s
+        new = single_new.get(rowid, s) if t == "dict" else s
         if is_multi(w) and s <= RARE and counts.get(w, 0) >= MIN_COUNT:
             p_colloq = counts[w] / total * scale * (10 ** s / word_mass[w])
             cand = math.log10((LAMBDA * 10 ** s / Z + (1 - LAMBDA) * p_colloq) * Z)
@@ -74,4 +99,4 @@ for t in TABLES:
         upd.append((new, rowid))
     db.executemany(f"UPDATE {t} SET score = ? WHERE rowid = ?", upd)
 db.commit()
-print(f"口語常用的冷門詞拉高 {raised} 筆")
+print(f"口語常用的冷門詞拉高 {raised} 筆，單字同讀音重排 {len(single_new)} 筆")

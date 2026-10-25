@@ -193,7 +193,7 @@ tools/build.sh work 2026.10.23 trendy bg_ptt  # 產出 work/out（資料包）�
 
 小麥注音的詞頻來自書面語料，秒殺、手環、咖哩飯這類生活詞分數很低。`tools/build.sh` 每次建置都會用
 [`sources/colloquial_counts.tsv`](sources/colloquial_counts.tsv)（PTT、Dcard 約 1.9 億字裡每個詞出現幾次）
-把「書面很冷門、口語常用」的詞拉上來，其他詞不動（規則寫在 `tools/apply_colloquial.py` 開頭）。重算次數：
+把「書面很冷門、口語常用」的詞拉上來，單字則在同讀音裡照口語次數重排（ㄇㄚ 先「嗎」），其他詞不動（規則寫在 `tools/apply_colloquial.py` 開頭）。重算次數：
 
 ```bash
 tools/fetch_corpus.sh work/corpus bg_ptt bg_dcard
