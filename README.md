@@ -189,6 +189,18 @@ tools/build.sh work 2026.10.23 trendy bg_ptt  # 產出 work/out（資料包）�
 
 基底詞庫（`base/`，主詞庫＋目前所有資料）放在 Release `base`，App repo 打包時也從這裡取用。
 
+### 口語詞頻
+
+小麥注音的詞頻來自書面語料，眼妝、載具、唇色這類生活詞分數很低。`tools/build.sh` 每次建置都會用
+[`sources/colloquial_counts.tsv`](sources/colloquial_counts.tsv)（PTT、Dcard 約 1.9 億字裡每個詞出現幾次）
+把「書面很冷門、口語常用」的詞拉上來，其他詞不動（規則寫在 `tools/apply_colloquial.py` 開頭）。重算次數：
+
+```bash
+tools/fetch_corpus.sh work/corpus bg_ptt bg_dcard
+gunzip -c base/scorpio_dict.db.gz > work/dict.db
+tools/count_colloquial.py work/dict.db work/corpus sources/colloquial_counts.tsv
+```
+
 ## 授權
 
 程式（`tools/`、`radar/`）是 [MIT License](LICENSE)；詞庫資料依各來源授權，見 [DATA_LICENSES.md](DATA_LICENSES.md)。

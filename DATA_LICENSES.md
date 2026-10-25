@@ -36,6 +36,11 @@
 | Dcard | Hugging Face [iddle/dcard_conversations](https://huggingface.co/datasets/iddle/dcard_conversations) | MIT License |
 | 流行與口語用語 | 本專案人工整理（`sources/trendy.txt` 的 `[pairs]`） | MIT License（同本專案） |
 
+## 口語詞頻
+
+[`sources/colloquial_counts.tsv`](sources/colloquial_counts.tsv) 只存「詞 → 在語料裡出現幾次」，不含原文；來源是上表的 PTT 與 Dcard 語料（授權同上表）。
+用來把書面詞頻很冷門、口語卻常用的詞在主詞庫與附加詞庫裡的分數拉上來（`tools/apply_colloquial.py`）。
+
 ## 相同方式分享（ShareAlike）
 
 維基百科與 FrequencyWords 是 CC BY-SA 4.0，所以從它們衍生的部分（`bg_wiki` 資料包、基底詞庫的 `english_dict` 表）再散布時也要以 CC BY-SA 4.0 授權並註明出處。其他程式碼與資料不受影響。
