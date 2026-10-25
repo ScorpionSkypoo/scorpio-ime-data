@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-25T09:11:28Z",
+  "updated": "2026-10-25T09:41:16Z",
   "packs": [
     {
       "id": "core",
@@ -171,11 +171,11 @@
       "id": "emoji",
       "group": "emoji",
       "name": "Emoji",
-      "version": "2026.10.25.1645",
+      "version": "2026.10.25.1741",
       "rows": 6561,
       "size": 83241,
-      "sha256": "7398a4404bc6fb1f35615aa78f7b47b540ca6cac473e83c68364d7f60c197d54",
-      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.25.1645/emoji-2026.10.25.1645.scd.gz",
+      "sha256": "ffdacce03747f18ed31c386c5b1dd1f8b420e403b5799050480f87c5c28cdd72",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.25.1741/emoji-2026.10.25.1741.scd.gz",
       "minAppVersion": 172,
       "description": "",
       "source": "Unicode CLDR 繁中註解",
