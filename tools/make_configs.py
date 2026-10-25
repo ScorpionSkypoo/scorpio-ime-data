@@ -21,7 +21,7 @@ only = sys.argv[6:]
 
 SCHEMA = 1
 # 第一個認得線上鍵盤設定的 App versionCode
-MIN_APP_VERSION_CODE = 170
+MIN_APP_VERSION_CODE = 200
 ZHUYIN = set("ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦ")
 
 

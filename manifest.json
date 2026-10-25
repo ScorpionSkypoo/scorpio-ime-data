@@ -11,7 +11,7 @@
       "size": 6520091,
       "sha256": "6dfeb848dda77a8c844747661f71f8220443ea9778bad23cf2bc327f38a4f7ef",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.25.1645/core-2026.10.25.1645.scd.gz",
-      "minAppVersion": 170,
+      "minAppVersion": 200,
       "description": "常用字詞與讀音，整句選字的基礎，不能關閉",
       "source": "小麥注音輸入法詞庫（McBopomofo）",
       "license": "MIT License",
@@ -176,7 +176,7 @@
       "size": 83241,
       "sha256": "7398a4404bc6fb1f35615aa78f7b47b540ca6cac473e83c68364d7f60c197d54",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.25.1645/emoji-2026.10.25.1645.scd.gz",
-      "minAppVersion": 170,
+      "minAppVersion": 200,
       "description": "",
       "source": "Unicode CLDR 繁中註解",
       "license": "Unicode License v3",
@@ -194,7 +194,7 @@
       "size": 871643,
       "sha256": "21062442cddfa2b57af025b00dcf9a52691481309b099d0f38220d4d11ef4300",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.25.1645/en-2026.10.25.1645.scd.gz",
-      "minAppVersion": 170,
+      "minAppVersion": 200,
       "description": "",
       "source": "英文詞頻與 OpenSubtitles 口語接續",
       "license": "見 DATA_LICENSES.md",
@@ -212,7 +212,7 @@
       "size": 382107,
       "sha256": "3baaaa71d8266d0acd7133f45e9963ba7f3d4343141d907129db1a29eff99d13",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.25.1645/cangjie-2026.10.25.1645.scd.gz",
-      "minAppVersion": 170,
+      "minAppVersion": 200,
       "description": "",
       "source": "倉頡碼表",
       "license": "見 DATA_LICENSES.md",
@@ -344,7 +344,7 @@
       "size": 3891,
       "sha256": "90a6e945f810a8995fcad4b1ce6270467cc7668d7f7a0dcd3a207177a46e23a4",
       "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.25.1711/ime-2026.10.25.1711.json",
-      "minAppVersion": 170
+      "minAppVersion": 200
     }
   ]
 }

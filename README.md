@@ -18,7 +18,7 @@
 | `bg_ptt` | PTT 文章、推文的詞與詞搭配 | 接續詞 |
 | `bg_dcard` | Dcard 討論串的詞與詞搭配 | 接續詞 |
 
-App 內建、一律使用的資料也能線上更新（manifest 標 `"system": true`，App 不列開關、有新版就自動更新；App versionCode 170 起才認得）：
+App 內建、一律使用的資料也能線上更新（manifest 標 `"system": true`，App 不列開關、有新版就自動更新；App versionCode 200 起才認得（發版後改成實際版本））：
 
 | 建置時指名 | 內容 | 來源檔 |
 |---|---|---|
@@ -31,7 +31,7 @@ App 內建、一律使用的資料也能線上更新（manifest 標 `"system": t
 
 ## 鍵盤設定
 
-[`config/ime.json`](config/ime.json) 是跟著資料更新的鍵盤設定（App versionCode 170 起），改了推上 main 就會自動建置發佈，手機每天檢查時套用：
+[`config/ime.json`](config/ime.json) 是跟著資料更新的鍵盤設定（App versionCode 200 起），改了推上 main 就會自動建置發佈，手機每天檢查時套用：
 
 - `lazySyllables`：只打聲母或介音時展開成哪些音節（`"ㄨ": ["ㄨㄛ", …]`，越前面越常用）
 - `kaomojiKeywords`：候選詞是這些詞時穿插哪一類顏文字（分類名稱要是顏文字資料包裡有的）
