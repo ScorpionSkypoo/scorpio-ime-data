@@ -30,7 +30,7 @@ only = sys.argv[6:]
 
 MANIFEST_SCHEMA = 1
 MIN_APP_SCD = 123  # 第一個讀得懂 SCD 資料包的 App versionCode（舊版 App 讀的是 SQLite 資料包，不能裝 SCD）
-MIN_APP_SYSTEM = 200  # 第一個認得 system（內建資料線上更新）的 App versionCode；舊版會把它當成可開關的詞庫列出來
+MIN_APP_SYSTEM = 172  # 第一個認得 system（內建資料線上更新）的 App versionCode；舊版會把它當成可開關的詞庫列出來
 # 指名用的 id → SCD 的 id（倉頡碼表跟倉頡版面同名，建置時用 cangjie_table 區分）
 SYSTEM = {"core": "core", "emoji": "emoji", "en": "en", "cangjie_table": "cangjie"}
 
