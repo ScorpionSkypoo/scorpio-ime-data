@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-25T08:45:42Z",
+  "updated": "2026-10-25T09:11:28Z",
   "packs": [
     {
       "id": "core",
@@ -335,6 +335,16 @@
       "requires": [],
       "language": "zh-TW",
       "languageName": "中文（台灣）"
+    }
+  ],
+  "configs": [
+    {
+      "id": "ime",
+      "version": "2026.10.25.1711",
+      "size": 3891,
+      "sha256": "90a6e945f810a8995fcad4b1ce6270467cc7668d7f7a0dcd3a207177a46e23a4",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.25.1711/ime-2026.10.25.1711.json",
+      "minAppVersion": 170
     }
   ]
 }
