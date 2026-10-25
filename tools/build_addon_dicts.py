@@ -11,6 +11,7 @@
   - 國家教育研究院「電子計算機學術名詞」naer_cs_terms.csv（政府資料開放授權條款第 1 版）
   - 教育部《重編國語辭典修訂本》dict-revised.json（g0v moedict-data，CC BY-ND 3.0 台灣）
   - 人工整理的台灣生活用語 sources/tw_life.txt（來源見檔案開頭：taiwan-md 用語對照、OpenCC、語料新詞）
+  - 人工整理的台灣百科專有名詞 sources/tw_md.txt（taiwan-md 文章，CC BY-SA 4.0）
 
 讀音以主詞庫推得：詞內能對到主詞庫的多字詞就用它的讀音（破音字跟著詞走），其餘單字取最常用讀音；
 有主詞庫沒有的字就整個略過。主詞庫已有同字同讀音的詞不重複收錄。
@@ -242,6 +243,16 @@ for line in open(f"{root}/sources/tw_life.txt", encoding="utf-8"):
     f = line.split()
     add(f[0], -6.4, "tw_life", f[1] if len(f) > 1 else None)
 built.add("tw_life")
+
+# 8. 台灣百科專有名詞：taiwan-md 文章裡主詞庫沒有的人名、團體、作品、地名、制度（黃仁勳、草東沒有派對、麟洋配…）；
+#    分數同台灣生活用語，口語語料常出現的一樣由 apply_colloquial.py 拉上來
+for line in open(f"{root}/sources/tw_md.txt", encoding="utf-8"):
+    line = line.strip()
+    if not line or line.startswith(("#", "[")):
+        continue
+    f = line.split()
+    add(f[0], -6.4, "tw_md", f[1] if len(f) > 1 else None)
+built.add("tw_md")
 
 db.execute("CREATE TABLE IF NOT EXISTS addon_dict (reading TEXT NOT NULL, toneless TEXT NOT NULL, word TEXT NOT NULL, score REAL NOT NULL, "
            "initials TEXT NOT NULL, finals TEXT NOT NULL, source TEXT NOT NULL)")

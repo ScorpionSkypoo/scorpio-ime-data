@@ -194,6 +194,12 @@ tools/build.sh work 2026.10.23 trendy bg_ptt  # 產出 work/out（資料包）�
 [`sources/tw_life.txt`](sources/tw_life.txt)：主詞庫沒有的常用詞（免運、截圖、貼文、按讚、執行緒…），人工整理，來源寫在檔案開頭。
 新詞候選用 `tools/mine_new_words.py`（PTT、Dcard 等大語料的新詞發現，同 `radar/discover.py` 的判斷方式）找，看過再加。
 
+### 台灣百科專有名詞
+
+[`sources/tw_md.txt`](sources/tw_md.txt)：taiwan-md 文章裡主詞庫沒有的人名、團體、作品、地名、制度用語（黃仁勳、草東沒有派對、麟洋配…）。
+候選用 `tools/mine_taiwan_md.py <taiwan-md 目錄> <dict.db> <輸出 tsv> [語料目錄]` 找：已經看過的詞（收錄的、`# 不收：`）不會再列；
+taiwan-md 的文章大多是 AI 寫的，給語料目錄會另外數 PTT、Dcard、維基的次數，真人語料沒出現的多半是 AI 文章才有的詞組。
+
 ### 口語詞頻
 
 小麥注音的詞頻來自書面語料，秒殺、手環、咖哩飯這類生活詞分數很低。`tools/build.sh` 每次建置都會用

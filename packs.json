@@ -35,6 +35,17 @@
       "category": "basic"
     },
     {
+      "id": "tw_md",
+      "group": "words",
+      "name": "台灣百科專有名詞",
+      "description": "taiwan-md 收錄的台灣人物、樂團、作品、地方與制度用語（黃仁勳、草東沒有派對、麟洋配、日治時期、九合一）",
+      "source": "taiwan-md 文章的標題、連結與粗體詞，人工整理（sources/tw_md.txt）",
+      "license": "CC BY-SA 4.0",
+      "url": "https://github.com/frank890417/taiwan-md",
+      "version": "2026.10",
+      "category": "basic"
+    },
+    {
       "id": "tw_places",
       "group": "words",
       "name": "台灣地名與路名",

@@ -46,6 +46,14 @@
 | OpenCC 台灣詞語 | [BYVoid/OpenCC](https://github.com/BYVoid/OpenCC) `data/dictionary/TWPhrases.txt` | Apache License 2.0 |
 | 語料裡常出現的新詞 | 上表的 PTT、Dcard 語料與 taiwan-md 文章（CC BY-SA 4.0），`tools/mine_new_words.py` 挑候選後人工選 | 同各語料 |
 
+## 台灣百科專有名詞
+
+[`sources/tw_md.txt`](sources/tw_md.txt) 是人工整理的詞表（每個詞都看過），只取詞條，不含文章內容：
+
+| 來源 | 原始資料 | 授權 |
+|---|---|---|
+| taiwan-md 文章的標題、tags、連結與粗體詞 | [frank890417/taiwan-md](https://github.com/frank890417/taiwan-md) `knowledge/`，`tools/mine_taiwan_md.py` 挑候選後人工選 | CC BY-SA 4.0 |
+
 ## 口語詞頻
 
 [`sources/colloquial_counts.tsv`](sources/colloquial_counts.tsv) 只存「詞 → 在語料裡出現幾次」，不含原文；來源是上表的 PTT 與 Dcard 語料（授權同上表）。
