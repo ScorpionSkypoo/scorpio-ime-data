@@ -18,7 +18,16 @@
 | `bg_ptt` | PTT 文章、推文的詞與詞搭配 | 接續詞 |
 | `bg_dcard` | Dcard 討論串的詞與詞搭配 | 接續詞 |
 
-主詞庫（小麥注音）、英文、倉頡、Emoji 跟著 App 一起發佈，不做線上更新。
+App 內建、一律使用的資料也能線上更新（manifest 標 `"system": true`，App 不列開關、有新版就自動更新；App versionCode 170 起才認得）：
+
+| 建置時指名 | 內容 | 來源檔 |
+|---|---|---|
+| `core` | 主詞庫（小麥注音），約 6 MB，有改才發佈 | base |
+| `emoji` | Emoji 關鍵字與面板分類 | `emoji/zh_Hant.xml`（CLDR 繁中註解）、`emoji/emoji-test.txt`（Unicode） |
+| `en` | 英文詞頻與接續 | base |
+| `cangjie_table` | 倉頡／速成碼表（SCD 的 id 是 `cangjie`，跟倉頡版面同名，建置時用這個名字區分） | base |
+
+例：Unicode 出新版 Emoji 時，換掉 `emoji/` 的兩個檔，手動執行「建置並發佈資料包」填 `emoji`。
 
 `packs.json` 的 `bundled: false` 表示 App 不內建、只能在「字典與學習 → 可下載的詞庫」打開開關下載；`default: false` 表示預設不開。
 

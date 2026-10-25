@@ -7,7 +7,9 @@ description、source、license、url；內容依 group 是詞（流行用語另�
 App 解壓後直接 mmap 使用，依 meta.id 換掉同 id 的舊檔。輸出的同時把 <dict.db> 的 dict_packs、<bigram.db> 的 pack_versions 改成這一版。
 
 用法：make_packs.py <dict.db> <bigram.db> <輸出目錄> <版本> <下載網址前綴> [資料包 id...]
-  沒給 id 就輸出 packs.json 裡所有能線上更新的資料包（主詞庫 core 跟著 App 走，不做成資料包）
+  沒給 id 就輸出 packs.json 裡所有能線上更新的資料包
+  App 內建、一律使用的資料（主詞庫 core、emoji、英文 en、倉頡碼表 cangjie_table）要指名才建：
+  manifest 標 system，App 不列開關、有新版就自動更新（主詞庫很大，有改才發佈）
   下載網址前綴例如 https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.23
 """
 import gzip
@@ -28,9 +30,17 @@ only = sys.argv[6:]
 
 MANIFEST_SCHEMA = 1
 MIN_APP_SCD = 123  # 第一個讀得懂 SCD 資料包的 App versionCode（舊版 App 讀的是 SQLite 資料包，不能裝 SCD）
+MIN_APP_SYSTEM = 170  # 第一個認得 system（內建資料線上更新）的 App versionCode；舊版會把它當成可開關的詞庫列出來
+# 指名用的 id → SCD 的 id（倉頡碼表跟倉頡版面同名，建置時用 cangjie_table 區分）
+SYSTEM = {"core": "core", "emoji": "emoji", "en": "en", "cangjie_table": "cangjie"}
 
-packs = json.load(open(f"{root}/packs.json", encoding="utf-8"))["packs"]
-packs = [p for p in packs if p["id"] != "core" and (not only or p["id"] in only)]
+all_packs = json.load(open(f"{root}/packs.json", encoding="utf-8"))["packs"]
+packs = [p for p in all_packs if p["id"] != "core" and (not only or p["id"] in only)]
+for alias, pid in SYSTEM.items():
+    if alias in only:
+        info = next((p for p in all_packs if p["id"] == pid), None) or {"id": pid, **build_scd.BUILTIN[pid]}
+        packs.append({"id": pid, "group": info.get("group", pid), "name": info["name"], "description": info.get("description", ""),
+                      "source": info["source"], "license": info["license"], "url": info.get("url", ""), "system": True})
 os.makedirs(out_dir, exist_ok=True)
 
 src = sqlite3.connect(dict_db)
@@ -46,6 +56,7 @@ for p in packs:
     name = f"{pid}-{version}.scd"
     path = f"{out_dir}/{name}"
     data = build_scd.build(pid, src, bsrc, version)
+    system = p.get("system", False)
     if data is None:
         print(f"{pid}：沒有資料，略過")
         continue
@@ -55,7 +66,7 @@ for p in packs:
     blob = open(f"{path}.gz", "rb").read()
     entries[pid] = {
         "id": pid,
-        "group": p["group"],
+        "group": scd.Reader(data).meta.get("group", p["group"]) if data else p["group"],
         "name": p["name"],
         "version": version,
         "rows": rows,
@@ -63,7 +74,7 @@ for p in packs:
         "sha256": hashlib.sha256(blob).hexdigest(),
         "url": f"{base_url}/{name}.gz",
         # 不內建的資料包要 App 認得「未安裝、預設不開」才行，舊版 App 會把它當一般詞庫自動裝起來
-        "minAppVersion": MIN_APP_SCD,
+        "minAppVersion": MIN_APP_SYSTEM if system else MIN_APP_SCD,
         "description": p["description"],
         "source": p["source"],
         "license": p["license"],
@@ -71,6 +82,8 @@ for p in packs:
         "default": p.get("default", True),
         "category": p.get("category", ""),
     }
+    if system:
+        entries[pid]["system"] = True
     print(f"{pid} {version}：{rows} 筆，{len(blob) / 1024:.0f} KB")
     if not p.get("bundled", True):
         # 只能線上安裝的資料包不放進 base（App 不內建）
@@ -79,6 +92,9 @@ for p in packs:
         src.execute("DELETE FROM dict_packs WHERE id = ?", (pid,))
         src.commit()
         print(f"{pid}：不內建，已從 base 移除")
+        continue
+    # 內建的 emoji、en、cangjie 每次建置 base 都用當次版本，不必記
+    if system and pid != "core":
         continue
     # base 詞庫記下這版，App 打包時內建的就是最新版，不必一裝好就重新下載
     if src.execute("UPDATE dict_packs SET version = ? WHERE id = ?", (version, pid)).rowcount == 0:
