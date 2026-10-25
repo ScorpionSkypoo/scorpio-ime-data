@@ -236,7 +236,7 @@ db.execute("CREATE TABLE IF NOT EXISTS addon_dict (reading TEXT NOT NULL, tonele
            "initials TEXT NOT NULL, finals TEXT NOT NULL, source TEXT NOT NULL)")
 for src in built:
     db.execute("DELETE FROM addon_dict WHERE source = ?", (src,))
-db.executemany("INSERT INTO addon_dict VALUES (?,?,?,?,?,?,?)", rows.values())
+db.executemany("INSERT INTO addon_dict (reading, toneless, word, score, initials, finals, source) VALUES (?,?,?,?,?,?,?)", rows.values())
 db.execute("CREATE INDEX IF NOT EXISTS idx_addon_source ON addon_dict(source)")
 print("重建：", ", ".join(sorted(built)))
 
