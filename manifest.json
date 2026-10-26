@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-10-26T07:43:47Z",
+  "updated": "2026-10-26T08:01:07Z",
   "packs": [
     {
       "id": "core",
@@ -24,15 +24,15 @@
       "id": "trendy",
       "group": "words",
       "name": "流行與口語用語",
-      "version": "2026.10.26.1543",
+      "version": "2026.10.26.1600",
       "rows": 318,
-      "size": 13480,
-      "sha256": "e2da82b3a385accdbc8f379f4cb46db8764733abdb63a79407344fc37373154a",
-      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.26.1543/trendy-2026.10.26.1543.scd.gz",
+      "size": 13681,
+      "sha256": "8fddeed44dac9d1c743109a4f1552eb0abfaec8d6e550397c844ad0ac14c29a5",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.26.1600/trendy-2026.10.26.1600.scd.gz",
       "minAppVersion": 123,
-      "description": "網路流行語、社群用語與日常口語搭配，每年更新",
-      "source": "人工整理（tools/data/trendy.txt）",
-      "license": "本專案自製",
+      "description": "網路流行語、社群用語、時事人名與日常口語搭配，每週由新詞雷達找新詞、人工挑過後更新",
+      "source": "人工整理＋新詞雷達（Google Trends、PTT、Threads 熱門話題統計、公視新聞網、中文維基百科），只取詞",
+      "license": "本專案自製；維基百科條目標題 CC BY-SA 4.0",
       "bundled": true,
       "default": true,
       "category": "basic"
