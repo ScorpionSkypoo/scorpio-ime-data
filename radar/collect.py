@@ -15,7 +15,7 @@
 
 用法：collect.py <輸出 texts.jsonl> [--days 7] [--pages 10] [--trends-snapshots 目錄]
        collect.py <輸出 snapshot.jsonl> --trends-only
-  Google Trends 的 RSS 每次只給當下的 10 個熱搜：trends.yml 每 2 小時用 --trends-only 抓一次存成 artifact，
+  Google Trends 的 RSS 每次只給當下的 10 個熱搜：trends.yml 每 6 小時用 --trends-only 抓一次存成 artifact，
   每週雷達下載這一週的 artifact 放進 --trends-snapshots 目錄，跟當下抓的合併（同一個熱搜、新聞標題只留一次）
 """
 import argparse
@@ -203,7 +203,7 @@ def main():
     ap.add_argument("out")
     ap.add_argument("--days", type=int, default=7)
     ap.add_argument("--pages", type=int, default=10, help="每個看板最多往前翻幾頁")
-    ap.add_argument("--trends-only", action="store_true", help="只抓 Google Trends（每 2 小時的快照）")
+    ap.add_argument("--trends-only", action="store_true", help="只抓 Google Trends（每 6 小時的快照）")
     ap.add_argument("--trends-snapshots", help="之前存下的 Trends 快照（*.jsonl）所在目錄")
     args = ap.parse_args()
 

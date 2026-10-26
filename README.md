@@ -160,7 +160,7 @@ App 內建、一律使用的資料也能線上更新（manifest 標 `"system": t
 
 1. 蒐集 Google Trends 台灣熱搜、[Threads 熱門話題統計](https://tools.ccea.tw/threadscount/)過去 7 天的話題標題與摘要、[公視新聞網 RSS](https://news.pts.org.tw/xml/newsfeed.xml) 的標題與摘要，以及 PTT 熱門看板最近 7 天的文章與推文；也會拿熱搜字去 PTT 搜尋相關文章（[`radar/collect.py`](radar/collect.py)）。
    另外取中文維基百科最近 7 天的新條目與每天瀏覽最多的條目標題（只取標題）。
-   Google Trends 的 RSS 每次只給當下的 10 個熱搜，[`trends.yml`](.github/workflows/trends.yml) 每 2 小時抓一次存成 artifact（保留 10 天），雷達執行時把這一週的快照一起合併。
+   Google Trends 的 RSS 每次只給當下的 10 個熱搜，[`trends.yml`](.github/workflows/trends.yml) 每 6 小時抓一次存成 artifact（保留 10 天），雷達執行時把這一週的快照一起合併。
 2. 找出詞庫還沒有的新詞（[`radar/discover.py`](radar/discover.py)）：出現次數、凝固度（整串一起出現的機率遠高於拆開）、左右鄰字的多樣性，並排除能拆成兩個已知詞的組合。
 3. 排除簡體字與大陸用語：
    - OpenCC（`pip install opencc` 每次裝 PyPI 最新版）：`s2t` 轉換會變的是簡體字；`s2tw` 跟 `s2twp` 結果不同的是大陸用語。

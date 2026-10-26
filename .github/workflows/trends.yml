@@ -1,10 +1,10 @@
 name: Google Trends 快照
 
-# Google Trends 台灣熱搜的 RSS 每次只給當下的 10 個：每 2 小時抓一次存成 artifact（保留 10 天），
+# Google Trends 台灣熱搜的 RSS 每次只給當下的 10 個：每 6 小時抓一次存成 artifact（保留 10 天），
 # 每週的新詞雷達（radar.yml）下載這一週的快照一起用
 on:
   schedule:
-    - cron: "17 */2 * * *"
+    - cron: "17 */6 * * *"
   workflow_dispatch:
 
 permissions:
