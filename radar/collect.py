@@ -13,7 +13,10 @@
   6. 中文維基百科：最近幾天的新條目與每日瀏覽最多的條目（只取標題）。維基中文多半是大陸寫的，
      discover.py 只留台灣語料（PTT、公視…）裡也出現的標題
 
-用法：collect.py <輸出 texts.jsonl> [--days 7] [--pages 10]
+用法：collect.py <輸出 texts.jsonl> [--days 7] [--pages 10] [--trends-snapshots 目錄]
+       collect.py <輸出 snapshot.jsonl> --trends-only
+  Google Trends 的 RSS 每次只給當下的 10 個熱搜：trends.yml 每 2 小時用 --trends-only 抓一次存成 artifact，
+  每週雷達下載這一週的 artifact 放進 --trends-snapshots 目錄，跟當下抓的合併（同一個熱搜、新聞標題只留一次）
 """
 import argparse
 import html
@@ -200,7 +203,18 @@ def main():
     ap.add_argument("out")
     ap.add_argument("--days", type=int, default=7)
     ap.add_argument("--pages", type=int, default=10, help="每個看板最多往前翻幾頁")
+    ap.add_argument("--trends-only", action="store_true", help="只抓 Google Trends（每 2 小時的快照）")
+    ap.add_argument("--trends-snapshots", help="之前存下的 Trends 快照（*.jsonl）所在目錄")
     args = ap.parse_args()
+
+    if args.trends_only:
+        topics, news = trends()
+        with open(args.out, "w", encoding="utf-8") as f:
+            for src, ts in (("trends", topics), ("trends-news", news)):
+                for t in ts:
+                    f.write(json.dumps({"source": src, "text": t}, ensure_ascii=False) + "\n")
+        print(f"Google Trends 快照：{len(topics)} 個熱搜、{len(news)} 則新聞標題 → {args.out}")
+        return
 
     n = 0
     seen = set()
@@ -211,7 +225,15 @@ def main():
             n += 1
 
         topics, news = trends()
-        print(f"Google Trends：{len(topics)} 個熱搜、{len(news)} 則新聞標題")
+        if args.trends_snapshots and os.path.isdir(args.trends_snapshots):
+            for root, _, files in os.walk(args.trends_snapshots):
+                for name in sorted(files):
+                    if name.endswith(".jsonl"):
+                        for line in open(os.path.join(root, name), encoding="utf-8"):
+                            d = json.loads(line)
+                            (topics if d["source"] == "trends" else news).append(d["text"])
+        topics, news = list(dict.fromkeys(topics)), list(dict.fromkeys(news))
+        print(f"Google Trends：{len(topics)} 個熱搜、{len(news)} 則新聞標題（含這週的快照）")
         for t in topics:
             emit("trends", t)
         for t in news:
@@ -243,7 +265,8 @@ def main():
                     for text in article(url):
                         emit(f"ptt:{board}", text)
 
-        for t in topics[:20]:
+        # 熱搜字拿去 PTT 搜：快照多了以後熱搜有上百個，只搜最近的 30 個（當下抓的排前面）
+        for t in topics[:30]:
             for board in SEARCH_BOARDS:
                 for url in ptt_search(board, t):
                     if url not in seen:

@@ -11,6 +11,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  actions: read
 
 jobs:
   radar:
@@ -32,8 +33,22 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
 
+      - name: 下載這週的 Google Trends 快照
+        run: |
+          mkdir -p work/trends
+          SINCE=$(date -u -d '7 days ago' +%Y-%m-%dT%H:%M:%SZ)
+          gh api --paginate "repos/${{ github.repository }}/actions/artifacts?per_page=100" \
+            --jq ".artifacts[] | select(.name | startswith(\"trends-\")) | select(.expired | not) | select(.created_at >= \"$SINCE\") | .id" |
+          while read -r id; do
+            gh api "repos/${{ github.repository }}/actions/artifacts/$id/zip" > work/trends/$id.zip &&
+              unzip -q -o -d work/trends/$id work/trends/$id.zip && rm work/trends/$id.zip || true
+          done
+          echo "快照 $(ls work/trends | wc -l) 份"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
       - name: 蒐集語料
-        run: python radar/collect.py work/texts.jsonl --days 7
+        run: python radar/collect.py work/texts.jsonl --days 7 --trends-snapshots work/trends
         env:
           # 選用：Meta 通過 threads_keyword_search 審核後，把 token 放進 repo secrets 就會一起搜尋 Threads
           THREADS_ACCESS_TOKEN: ${{ secrets.THREADS_ACCESS_TOKEN }}
