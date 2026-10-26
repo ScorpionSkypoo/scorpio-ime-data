@@ -158,16 +158,19 @@ App 內建、一律使用的資料也能線上更新（manifest 標 `"system": t
 
 [`radar.yml`](.github/workflows/radar.yml) 每週一自動執行：
 
-1. 蒐集 Google Trends 台灣熱搜、[Threads 熱門話題統計](https://tools.ccea.tw/threadscount/)過去 7 天的話題標題與摘要，以及 PTT 熱門看板最近 7 天的文章與推文；也會拿熱搜字去 PTT 搜尋相關文章（[`radar/collect.py`](radar/collect.py)）。
+1. 蒐集 Google Trends 台灣熱搜、[Threads 熱門話題統計](https://tools.ccea.tw/threadscount/)過去 7 天的話題標題與摘要、[公視新聞網 RSS](https://news.pts.org.tw/xml/newsfeed.xml) 的標題與摘要，以及 PTT 熱門看板最近 7 天的文章與推文；也會拿熱搜字去 PTT 搜尋相關文章（[`radar/collect.py`](radar/collect.py)）。
+   另外取中文維基百科最近 7 天的新條目與每天瀏覽最多的條目標題（只取標題）。
 2. 找出詞庫還沒有的新詞（[`radar/discover.py`](radar/discover.py)）：出現次數、凝固度（整串一起出現的機率遠高於拆開）、左右鄰字的多樣性，並排除能拆成兩個已知詞的組合。
 3. 排除簡體字與大陸用語：
    - OpenCC（`pip install opencc` 每次裝 PyPI 最新版）：`s2t` 轉換會變的是簡體字；`s2tw` 跟 `s2twp` 結果不同的是大陸用語。
    - OpenCC GitHub master 最新的 [`TWPhrases.txt`](https://github.com/BYVoid/OpenCC/blob/master/data/dictionary/TWPhrases.txt)：每次執行直接下載，左欄的大陸用語都排除（不必等 OpenCC 發新版）。
    - [`sources/mainland_terms.txt`](sources/mainland_terms.txt)：OpenCC 沒收的大陸用語（靠譜、老鐵、內卷…），人工維護。
    - [`sources/mainland_terms_naer.txt`](sources/mainland_terms_naer.txt)：國家教育研究院〈兩岸對照名詞－計算機〉裡跟台灣譯名不同的大陸譯名。
-4. 開 PR，把候選詞加進 [`sources/trendy.txt`](sources/trendy.txt)，PR 說明列出每個詞的次數與例句。
+4. 維基條目標題轉成台灣正體，詞庫沒有、在台灣語料（PTT、公視…）也出現 3 次以上的才收（維基中文多半是大陸寫的，只在維基出現的不收）。
+5. taiwan-md：拿最新的 taiwan-md 跑 [`tools/mine_taiwan_md.py`](tools/mine_taiwan_md.py)，還沒看過的專有名詞（前 40 個）加進 [`sources/tw_md.txt`](sources/tw_md.txt)。
+6. 開 PR，把候選詞加進 [`sources/trendy.txt`](sources/trendy.txt)（新詞、維基條目）與 `sources/tw_md.txt`，PR 說明列出每個詞的次數與例句、taiwan-md 新詞要確認讀音的破音字。
 
-**審核**：在 PR 的 Files changed 刪掉不要的詞再合併。合併後 [`packs.yml`](.github/workflows/packs.yml) 會重建 `trendy` 並發佈新版，手機隔天就會更新。
+**審核**：在 PR 的 Files changed 刪掉不要的詞再合併（taiwan-md 不收的詞移到 `tw_md.txt` 檔尾的「# 不收：」，下次就不會再列）。合併後 [`packs.yml`](.github/workflows/packs.yml) 會重建 `trendy`（改到 `tw_md.txt` 也重建 `tw_md`）並發佈新版，手機隔天就會更新。
 
 Threads：設定 repo secret `THREADS_ACCESS_TOKEN` 後，雷達會用熱搜字搜尋 Threads。Meta 要通過 `threads_keyword_search` 權限審核才搜得到公開貼文，沒通過只會搜到自己的貼文。
 

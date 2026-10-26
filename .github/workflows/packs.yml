@@ -67,6 +67,10 @@ jobs:
             CHANGED=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
             P=""
             echo "$CHANGED" | grep -qE '^(sources/|packs.json)' && P="trendy"
+            # 各資料包自己的來源檔（新詞雷達的 PR 會改到 tw_md.txt）
+            echo "$CHANGED" | grep -qx 'sources/tw_md.txt' && P="$P tw_md"
+            echo "$CHANGED" | grep -qx 'sources/tw_life.txt' && P="$P tw_life"
+            echo "$CHANGED" | grep -qx 'sources/core_fixes.txt' && P="$P core tw_places"
             for f in $(echo "$CHANGED" | grep -E '^(plugins|layouts|config)/.+\.json$'); do
               [ -f "$f" ] && P="$P $(basename "$f" .json)"
             done

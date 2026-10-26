@@ -10,8 +10,12 @@
   - 含簡體字或大陸用語的不收（OpenCC：s2t 會變的是簡體字；s2tw 與 s2twp 結果不同的是大陸用語，例如視頻、軟件；
     OpenCC 沒收的大陸用語列在 sources/mainland_terms*.txt）
 另外把 Google Trends 熱搜裡詞庫沒有的詞另外列出（多半是人名、事件，收不收由人決定）。
+維基百科的新條目、熱門條目（轉成台灣正體）：詞庫沒有、在台灣語料（PTT、公視、Threads…）也出現至少 WIKI_MIN 次的才收，
+加進 trendy.txt；維基中文多半是大陸寫的，只在維基出現的不收。
+--twmd：tools/mine_taiwan_md.py 挑出的 taiwan-md 新詞候選（還沒看過的），前 TWMD_TOP 個加進 sources/tw_md.txt。
 
 用法：discover.py <texts.jsonl> <scorpio_dict.db（解壓後）> <報告 report.md> [--apply sources/trendy.txt] [--top 60]
+                   [--twmd work/twmd.tsv --twmd-apply sources/tw_md.txt]
   --apply：把候選詞加進 trendy.txt 的 [words]（附上日期註解），給 PR 審核時刪掉不要的
 """
 import argparse
@@ -42,6 +46,11 @@ EDGE_STOP = set("的了是在和與及或而就也都又還才把被讓給對向
 # 只排除結尾：副詞、代名詞、量詞收尾的多半是「真的很」「幫你」「一堆人」「第二部」這種碎片
 END_STOP = EDGE_STOP | set("很太超更最沒不你我他她它們人部種次樣下上中裡著過嗎")
 MIN_LEN, MAX_LEN = 2, 5
+WIKI_MIN = 3
+TWMD_TOP = 40
+RE_TITLE = re.compile(r"[一-鿿]{2,8}")
+SOURCE_NAMES = {"trends": "Google Trends 熱搜", "trends-news": "Google Trends 新聞標題", "pts": "公視新聞",
+                "threadscount": "Threads 熱門話題統計", "threads": "Threads", "wiki-new": "維基新條目", "wiki-top": "維基熱門條目"}
 
 
 def load_vocab(db_path):
@@ -78,6 +87,8 @@ def main():
     ap.add_argument("--top", type=int, default=60)
     ap.add_argument("--min-freq", type=int, default=6)
     ap.add_argument("--opencc-twphrases", help="OpenCC GitHub master 最新的 TWPhrases.txt（左欄是大陸用語）")
+    ap.add_argument("--twmd", help="tools/mine_taiwan_md.py 的輸出 tsv")
+    ap.add_argument("--twmd-apply", help="sources/tw_md.txt")
     args = ap.parse_args()
 
     vocab = load_vocab(args.dict_db)
@@ -101,10 +112,18 @@ def main():
             if line and not line.startswith(("#", "[")):
                 vocab.add(line.split()[0])
 
-    runs, trend_topics = [], []
+    runs, trend_topics, wiki = [], [], []
+    sources = Counter()
+    to_tw = _s2twp.convert if "_s2twp" in globals() else (lambda t: t)
     for line in open(args.texts, encoding="utf-8"):
         d = json.loads(line)
-        if d["source"] == "trends":
+        src = d["source"]
+        sources[SOURCE_NAMES.get(src, "PTT" if src.startswith("ptt") else src)] += 1
+        if src.startswith("wiki"):
+            # 維基只取標題當候選，不算進語料（大陸寫的條目會讓詞頻偏掉）
+            wiki.append(to_tw(d["text"]).replace(" ", ""))
+            continue
+        if src == "trends":
             trend_topics.append(d["text"].replace(" ", ""))
         runs.extend(RE_RUN.findall(d["text"]))
 
@@ -161,28 +180,67 @@ def main():
 
     trend_new = [t for t in dict.fromkeys(trend_topics) if RE_RUN.fullmatch(t) and t not in vocab and t not in mainland and not is_simplified(t)]
 
+    # 維基標題：台灣語料裡也出現的才收
+    corpus = "\n".join(runs)
+    picked_words = {c[1] for c in picked}
+    wiki_new = []
+    for t in dict.fromkeys(wiki):
+        if not RE_TITLE.fullmatch(t) or t in vocab or t in mainland or t in picked_words or t in trend_new or splits_into_known(t, vocab):
+            continue
+        c = corpus.count(t)
+        if c >= WIKI_MIN:
+            wiki_new.append((c, t))
+    wiki_new.sort(reverse=True)
+
+    # taiwan-md：mine_taiwan_md.py 的候選（欄位：詞、讀音、全文次數、篇數、出處、要確認讀音的破音字）
+    twmd = []
+    if args.twmd and __import__("os").path.exists(args.twmd):
+        for line in open(args.twmd, encoding="utf-8"):
+            if line.startswith("#"):
+                continue
+            f = line.rstrip("\n").split("\t")
+            if len(f) >= 6 and f[0] not in vocab and f[0] not in mainland and not is_simplified(f[0]):
+                twmd.append(f)
+        twmd = twmd[:TWMD_TOP]
+
     today = time.strftime("%Y-%m-%d")
     with open(args.report, "w", encoding="utf-8") as f:
         f.write(f"## 新詞雷達 {today}\n\n")
-        f.write(f"語料：{len(runs):,} 段、{total:,} 字（Google Trends 熱搜、Threads 熱門話題統計 tools.ccea.tw/threadscount、PTT 近期文章與推文）。\n\n")
+        f.write(f"語料：{len(runs):,} 段、{total:,} 字（" + "、".join(f"{k} {v:,}" for k, v in sources.most_common()) + "）。\n\n")
         f.write("下面的候選詞已經加進 `sources/trendy.txt`。**合併前請在 Files changed 刪掉不要的行**，合併後會自動發佈新版流行用語詞庫。\n\n")
         f.write("| 候選詞 | 次數 | 凝固度 | 左／右自由度 | 例句 |\n|---|---:|---:|---:|---|\n")
         for _, g, fr, pmi, le, re_ in picked:
             f.write(f"| {g} | {fr} | {pmi:.1f} | {le:.1f}／{re_:.1f} | {example(g)} |\n")
+        if wiki_new:
+            f.write(f"\n### 維基百科新條目、熱門條目\n\n詞庫沒有、台灣語料（PTT、公視…）也出現 {WIKI_MIN} 次以上的，**已經加進 `sources/trendy.txt`**（括號是台灣語料次數）。\n\n")
+            f.write("、".join(f"{t}（{c}）" for c, t in wiki_new) + "\n")
+        if twmd:
+            f.write("\n### taiwan-md 新詞\n\n還沒看過的專有名詞，**已經加進 `sources/tw_md.txt`**；不要的刪掉，或移到檔尾的「# 不收：」那幾行，下次就不會再列。"
+                    "破音字欄有字的要確認讀音（讀音不對就在詞後面寫正確讀音）。\n\n| 詞 | 推得的讀音 | 篇數 | 破音字 |\n|---|---|---:|---|\n")
+            for x in twmd:
+                f.write(f"| {x[0]} | {x[1]} | {x[3]} | {x[5]} |\n")
         if trend_new:
             f.write("\n### Google Trends 熱搜中詞庫沒有的詞\n\n多半是人名或事件，**沒有自動加入**；要收的話手動加到 `sources/trendy.txt`。\n\n")
             f.write("、".join(trend_new) + "\n")
     print(f"候選 {len(picked)} 個 → {args.report}")
 
-    if args.apply and picked:
+    if args.apply and (picked or wiki_new):
         lines = open(args.apply, encoding="utf-8").read().split("\n")
         at = lines.index("[pairs]")
         while at > 0 and not lines[at - 1].strip():
             at -= 1
-        block = [f"# 新詞雷達 {today}"] + [c[1] for c in picked]
+        block = ([f"# 新詞雷達 {today}"] + [c[1] for c in picked] if picked else []) + \
+            ([f"# 新詞雷達 {today}（維基條目）"] + [t for _, t in wiki_new] if wiki_new else [])
         lines[at:at] = block
         open(args.apply, "w", encoding="utf-8").write("\n".join(lines))
         print(f"已加入 {args.apply}")
+    if args.twmd_apply and twmd:
+        lines = open(args.twmd_apply, encoding="utf-8").read().rstrip("\n").split("\n")
+        # 加在最後一個收錄的詞後面（檔尾是「# 不收：」）
+        at = max(i for i, l in enumerate(lines) if l.strip() and not l.startswith(("#", "["))) + 1
+        lines[at:at] = [f"# 新詞雷達 {today}"] + [x[0] for x in twmd]
+        open(args.twmd_apply, "w", encoding="utf-8").write("\n".join(lines) + "\n")
+        print(f"已加入 {args.twmd_apply}：{len(twmd)} 個")
 
 
 if __name__ == "__main__":

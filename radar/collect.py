@@ -9,6 +9,9 @@
      該站 robots.txt 允許存取、只禁止拿去訓練 AI，這裡只拿來找新詞，一週抓一次）
   4. Threads 關鍵字搜尋（設定環境變數 THREADS_ACCESS_TOKEN 才會啟用；
      Meta App Review 通過 threads_keyword_search 前只搜得到自己的貼文）
+  5. 公視新聞網 RSS（news.pts.org.tw/xml/newsfeed.xml）：最近的新聞標題與摘要，補時事人名、地名
+  6. 中文維基百科：最近幾天的新條目與每日瀏覽最多的條目（只取標題）。維基中文多半是大陸寫的，
+     discover.py 只留台灣語料（PTT、公視…）裡也出現的標題
 
 用法：collect.py <輸出 texts.jsonl> [--days 7] [--pages 10]
 """
@@ -68,6 +71,52 @@ RE_META = re.compile(r'<div class="article-metaline.*?</div>\s*</div>|<div class
 RE_PUSH = re.compile(r'<span class="[^"]*push-content">:?\s*(.*?)</span>', re.S)
 RE_TAG = re.compile(r"<[^>]+>")
 RE_STAMP = re.compile(r"/M\.(\d{10})\.")
+
+
+def pts():
+    """公視新聞網 RSS（Atom）：標題、摘要"""
+    text = get("https://news.pts.org.tw/xml/newsfeed.xml")
+    if not text:
+        return []
+    ns = {"a": "http://www.w3.org/2005/Atom"}
+    out = []
+    for e in ET.fromstring(text).iter("{http://www.w3.org/2005/Atom}entry"):
+        for tag in ("a:title", "a:summary"):
+            t = (e.findtext(tag, default="", namespaces=ns) or "").strip()
+            if t:
+                out.append(html.unescape(t))
+    return out
+
+
+WIKI = "https://zh.wikipedia.org/w/api.php"
+RE_PAREN = re.compile(r"\s*[（(].*?[)）]$")
+
+
+def wiki_titles(days):
+    """中文維基最近 days 天的新條目、每天瀏覽最多的 1000 個條目（只取標題，去掉「（歌手）」這種消歧義括號）"""
+    new, top = [], []
+    since = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(time.time() - days * 86400))
+    params = {"action": "query", "list": "recentchanges", "rctype": "new", "rcnamespace": "0", "rclimit": "500",
+              "rcprop": "title", "rcend": since, "format": "json"}
+    for _ in range(40):
+        text = get(WIKI + "?" + urllib.parse.urlencode(params))
+        if not text:
+            break
+        d = json.loads(text)
+        new += [x["title"] for x in d.get("query", {}).get("recentchanges", [])]
+        if "continue" not in d:
+            break
+        params.update(d["continue"])
+        time.sleep(DELAY)
+    for k in range(1, days + 1):
+        day = time.strftime("%Y/%m/%d", time.gmtime(time.time() - k * 86400))
+        text = get(f"https://wikimedia.org/api/rest_v1/metrics/pageviews/top/zh.wikipedia/all-access/{day}")
+        if text:
+            for it in json.loads(text).get("items", []):
+                top += [a["article"].replace("_", " ") for a in it.get("articles", []) if ":" not in a["article"]]
+        time.sleep(DELAY)
+    strip = lambda ts: list(dict.fromkeys(RE_PAREN.sub("", t) for t in ts))
+    return strip(new), strip(top)
 
 
 def clean(fragment):
@@ -167,6 +216,18 @@ def main():
             emit("trends", t)
         for t in news:
             emit("trends-news", t)
+
+        news = pts()
+        print(f"公視新聞：{len(news)} 段")
+        for t in news:
+            emit("pts", t)
+
+        new, top = wiki_titles(args.days)
+        print(f"維基百科：{len(new)} 個新條目、{len(top)} 個熱門條目")
+        for t in new:
+            emit("wiki-new", t)
+        for t in top:
+            emit("wiki-top", t)
 
         tc = threadscount()
         print(f"Threads 熱門話題統計：{len(tc)} 段")
