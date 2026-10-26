@@ -11,7 +11,7 @@
 | 內容 | 來源 | 授權 |
 |---|---|---|
 | 主詞庫：字詞、讀音、詞頻 | [小麥注音輸入法](https://github.com/openvanilla/McBopomofo)詞庫 | MIT License，著作權聲明見 [`licenses/McBopomofo-MIT.txt`](licenses/McBopomofo-MIT.txt) |
-| 流行與口語用語 | 本專案人工整理（[`sources/trendy.txt`](sources/trendy.txt)） | MIT License（同本專案） |
+| 流行與口語用語 | 本專案人工整理（[`sources/trendy.txt`](sources/trendy.txt)），加上每週[新詞雷達](README.md#新詞雷達)找到、人工挑過的詞。雷達的語料：[Google Trends](https://trends.google.com/trending?geo=TW) 台灣熱搜與附帶的新聞標題、[PTT](https://www.ptt.cc) 熱門看板文章與推文、[Threads 熱門話題統計](https://tools.ccea.tw/threadscount/)、[公視新聞網](https://news.pts.org.tw) RSS 標題與摘要、[中文維基百科](https://zh.wikipedia.org)新條目與熱門條目的標題。只從語料取詞（詞與出現次數），不收錄文章內容，語料不進版控 | MIT License（同本專案）；取自維基百科條目標題的詞：[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/) |
 | 台灣地名與路名 | 內政部戶政司〈[全國路名資料](https://data.gov.tw/dataset/35321)〉 | [政府資料開放授權條款－第 1 版](https://data.gov.tw/license) |
 | 台灣景點與地標 | 交通部觀光署〈[景點－觀光資訊資料庫](https://data.gov.tw/dataset/7777)〉 | 政府資料開放授權條款－第 1 版 |
 | 世界國家與城市 | [Unicode CLDR](https://cldr.unicode.org/) 地區與城市名稱、[Wikidata](https://www.wikidata.org/) | Unicode License v3、CC0 1.0 |
