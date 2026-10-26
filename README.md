@@ -212,6 +212,12 @@ gunzip -c base/scorpio_dict.db.gz > work/dict.db
 tools/count_colloquial.py work/dict.db work/corpus sources/colloquial_counts.tsv
 ```
 
+### 主詞庫修正
+
+[`sources/core_fixes.txt`](sources/core_fixes.txt)：口語加分之後套用（`tools/apply_core_fixes.py`）。刪掉台灣不這樣說的支語（視頻、激光、概率…，兩岸都用的點擊、查找不刪）
+與錯字，壓低搶走常用詞位置的冷門同音詞（是有 → 室友、遊資 → 郵資），修正或補上讀音（菠蘿麵包 ㄅㄛ）。
+台灣地名裡路名資料的異體字（双十街、山脚路）同時換回正體。刪掉的支語也列在 `sources/mainland_terms.txt`，新詞雷達不會再撿回來。
+
 ## 授權
 
 程式（`tools/`、`radar/`）是 [MIT License](LICENSE)；詞庫資料依各來源授權，見 [DATA_LICENSES.md](DATA_LICENSES.md)。

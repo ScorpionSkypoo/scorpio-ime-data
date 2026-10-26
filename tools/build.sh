@@ -29,6 +29,8 @@ gunzip -c "$R/base/scorpio_bigram.db.gz" > "$W/bigram.db"
 "$PY" -I "$R/tools/build_addon_dicts.py" "$W/raw" "$W/dict.db"
 # 口語常用、書面詞頻卻很冷門的詞拉上來（sources/colloquial_counts.tsv；每次從原本的分數重算）
 "$PY" -I "$R/tools/apply_colloquial.py" "$W/dict.db" "$R/sources/colloquial_counts.tsv"
+# 主詞庫修正（sources/core_fixes.txt：支語、錯字、同音詞搶位置、讀音）與地名異體字；要在口語加分之後
+"$PY" -I "$R/tools/apply_core_fixes.py" "$W/dict.db" "$R/sources/core_fixes.txt"
 # Emoji 關鍵字（CLDR 繁中註解）與面板分類（Unicode emoji-test.txt），來源檔在 emoji/
 if [[ " $PACKS " == *" emoji "* ]]; then
   "$PY" -I "$R/tools/build_emoji_dict.py" "$W/dict.db" "$R/emoji/zh_Hant.xml"
