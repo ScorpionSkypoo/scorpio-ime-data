@@ -1,0 +1,21 @@
+{
+  "schema": 2,
+  "id": "dachen_samsung",
+  "name": "注音（大千・三星鍵位）",
+  "language": "zh-TW",
+  "languageName": "中文（台灣）",
+  "spaceLabel": "注音·三星",
+  "description": "跟三星鍵盤一樣的大千鍵位：ㄦ 在右上角、刪除鍵在第 4 排最右邊，第 2、3 排錯開半鍵；空白鍵右邊是句號。",
+  "engine": "dachen",
+  "minAppVersion": 174,
+  "sort": 5,
+  "keys": {
+    "columns": 11,
+    "rows": [
+      "ㄅㄉˇˋㄓˊ˙ㄚㄞㄢㄦ",
+      "ㄆㄊㄍㄐㄔㄗㄧㄛㄟㄣ",
+      "ㄇㄋㄎㄑㄕㄘㄨㄜㄠㄤ",
+      ["ㄈㄌㄏㄒㄖㄙㄩㄝㄡㄥ", {"special": "backspace"}]
+    ]
+  }
+}

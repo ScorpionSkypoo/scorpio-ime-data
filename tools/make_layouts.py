@@ -3,7 +3,7 @@
 鍵盤版面：layouts/<id>.json → 輸出目錄的 <id>-<版本>.json，並更新 manifest.json 的 layouts。
 
 版面是宣告式的 JSON，只能選 App 內建的打字方式（engine），不含可執行的程式碼（格式見 README〈鍵盤版面〉）。
-大千注音內建在 App，不在這裡。
+內建的大千注音（10×4）在 App 裡；大千的其他鍵位（例如三星）用 engine "dachen" 加上 keys 宣告。
 
 用法：make_layouts.py <輸出目錄> <版本> <下載網址前綴> [版面 id...]（沒給就全部）
 """
@@ -18,15 +18,17 @@ out_dir, version, base_url = sys.argv[1:4]
 only = sys.argv[4:]
 
 SCHEMA = 2
-ENGINES = {"zhuyin26", "pinyin", "cangjie", "quick"}
+ENGINES = {"zhuyin26", "pinyin", "cangjie", "quick", "dachen"}
 # 41 個注音符號的順序（keymap 的第 i 個字母對應第 i 個符號）
 SYMBOLS = "ㄅㄆㄇㄈㄉㄊㄋㄌㄍㄎㄏㄐㄑㄒㄓㄔㄕㄖㄗㄘㄙㄧㄨㄩㄚㄛㄜㄝㄞㄟㄠㄡㄢㄣㄤㄥㄦ˙ˊˇˋ"
 # 第一個認得線上版面的 App versionCode（之前的版本內建版面，讀不懂 layouts）
 MIN_APP_VERSION_CODE = 134
+# 第一個認得 engine "dachen"（宣告的大千鍵位）的 App versionCode：v1.2.8（173）之後的版本
+MIN_APP_VERSION_DACHEN = 174
 
 
-def validate_keys(k, path):
-    """schema 2 的 keys（QWERTY 面板的字鍵排），規則跟 App 的 KeyboardLayout.parse 一樣，見 README〈字鍵排〉"""
+def validate_keys(k, path, engine):
+    """schema 2 的 keys（QWERTY 面板或大千鍵盤的字鍵排），規則跟 App 的 KeyboardLayout.parse、ChineseMethod.parse 一樣，見 README〈字鍵排〉"""
     cols = k.get("columns", 10)
     assert isinstance(cols, int) and 10 <= cols <= 12, f"{path}：columns 要是 10～12"
     rows = k.get("rows")
@@ -64,8 +66,13 @@ def validate_keys(k, path):
     assert backspaces == 1 and shifts <= 1, f"{path}：刪除鍵要剛好一個、Shift 最多一個"
     assert len(chars) == len(set(chars)), f"{path}：有重複的鍵"
     assert not any(c in "*:;" or c.isspace() for c in chars), f"{path}：* : ; 與空白不能當字鍵"
-    # 目前的打字方式都用 26 個英文字母
     letters = [c for c in chars if c not in nums]
+    if engine == "dachen":
+        # 大千：字鍵剛好是 41 個注音符號與聲調（含 ㄦ），沒有 Shift
+        assert sorted(letters) == sorted(SYMBOLS), f"{path}：大千的字鍵要剛好是 41 個注音符號與聲調各一次"
+        assert shifts == 0, f"{path}：大千不能有 Shift"
+        return
+    # 其他打字方式都用 26 個英文字母
     assert sorted(letters) == [chr(c) for c in range(ord("a"), ord("z") + 1)], f"{path}：字鍵要剛好是 a–z 各一次"
 
 
@@ -74,18 +81,21 @@ def validate(p, path, pack_ids):
     for key in ("id", "name", "engine", "language", "languageName"):
         assert key in p, f"{path}：缺少 {key}"
     assert p["id"] == os.path.basename(path)[:-5], f"{path}：id 要跟檔名一樣"
-    assert p["id"] != "dachen", f"{path}：大千注音內建在 App"
+    assert p["id"] != "dachen", f"{path}：內建的大千注音在 App 裡，id 不能是 dachen"
     assert p["engine"] in ENGINES, f"{path}：engine 要是 {sorted(ENGINES)} 其中之一"
     if p["engine"] == "zhuyin26":
         km = p.get("keymap", "")
         assert len(km) == len(SYMBOLS) and all("a" <= c <= "z" for c in km), f"{path}：keymap 要是 {len(SYMBOLS)} 個小寫字母"
+    if p["engine"] == "dachen":
+        assert "keys" in p, f"{path}：大千的版面要寫 keys（內建的 10×4 在 App 裡）"
+        assert p.get("minAppVersion", 0) >= MIN_APP_VERSION_DACHEN, f"{path}：大千的版面 minAppVersion 至少 {MIN_APP_VERSION_DACHEN}"
     for r in p.get("requires", []):
         assert r in pack_ids, f"{path}：requires 的 {r} 不在 packs.json"
     if "keys" in p:
         assert p.get("schema", 1) >= 2, f"{path}：有 keys 的版面 schema 要是 2"
         # 舊版 App 看不懂 keys（會整個不收），要寫第一個看得懂的 App versionCode
         assert isinstance(p.get("minAppVersion"), int), f"{path}：有 keys 的版面要寫 minAppVersion"
-        validate_keys(p["keys"], path)
+        validate_keys(p["keys"], path, p["engine"])
 
 
 os.makedirs(out_dir, exist_ok=True)
