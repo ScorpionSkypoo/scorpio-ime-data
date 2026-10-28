@@ -24,7 +24,7 @@ App 內建、一律使用的資料也能線上更新（manifest 標 `"system": t
 |---|---|---|
 | `core` | 主詞庫（小麥注音），約 6 MB，有改才發佈 | base |
 | `emoji` | Emoji 關鍵字與面板分類 | `emoji/zh_Hant.xml`（CLDR 繁中註解）、`emoji/emoji-test.txt`（Unicode） |
-| `en` | 英文詞頻與接續 | base |
+| `en` | 英文詞頻與接續，加上補充詞與顯示寫法（iPhone、Paris） | base、[`sources/en_extra.txt`](sources/en_extra.txt)（改了會自動重建） |
 | `cangjie_table` | 倉頡／速成碼表（SCD 的 id 是 `cangjie`，跟倉頡版面同名，建置時用這個名字區分） | base |
 
 例：Unicode 出新版 Emoji 時，換掉 `emoji/` 的兩個檔，手動執行「建置並發佈資料包」填 `emoji`。
@@ -40,7 +40,7 @@ App 內建、一律使用的資料也能線上更新（manifest 標 `"system": t
 
 `tools/make_configs.py` 照 App 的規則檢查，不合就中止、不發佈。
 
-`packs.json` 的 `bundled: false` 表示 App 不內建、只能在「字典與學習 → 可下載的詞庫」打開開關下載；`default: false` 表示預設不開。
+`packs.json` 的 `bundled: false` 表示 App 不內建、只能在「字典與學習 → 可下載的詞庫」打開開關下載；`default: false` 表示預設不開。`lang` 是這個資料包給哪個語言用的（`zh`、`en`、`ja`…，沒寫就是 `zh`；App 內建的 en 是 `en`），寫進資料包 meta 與 manifest，之後設定頁照語言分組、只列有安裝輸入法的語言。
 
 每個資料包是 gzip 壓縮的 SCD 二進位詞庫（`<id>-<版本>.scd.gz`），放在 Release `packs-<版本>`；App 解壓後直接 mmap 查詢，不經 SQLite。版本號是建置時間（`2026.10.23.1530`），App 逐段比數字大小。格式見 [`docs/scd-format.md`](docs/scd-format.md)、[`tools/scd.py`](tools/scd.py)；建置用的 SQLite 基底詞庫（Release `base` 的 `scorpio_*.db.gz`）轉成 SCD 的流程在 [`tools/build_scd.py`](tools/build_scd.py)、[`tools/make_packs.py`](tools/make_packs.py)，`tools/verify_scd.py` 會逐鍵比對 SCD 與 SQLite 的查詢結果。
 
@@ -156,6 +156,19 @@ App 內建、一律使用的資料也能線上更新（manifest 標 `"system": t
 - App 不認得的 `engine` 會略過，所以之後新增打字方式不會讓舊版 App 出錯。
 - 推上 main 後，[`packs.yml`](.github/workflows/packs.yml) 會驗證格式並發佈有改到的版面；已安裝的使用者隔天自動更新。
 
+### 長按副鍵（選填）
+
+比照 Gboard：字鍵長按輸入副鍵，鍵的右上角顯示第一個。寫在版面檔最上層（不在 `keys` 裡），schema 1 的版面也能用；
+舊版 App 不認得、照舊沒有副鍵，所以**不必提高 `minAppVersion`**。
+
+```json
+"long": { "q": "1", "e": "éèêë", "x": ["www.", ".com"], "a": "" }
+```
+
+- 字串：每個字一個選項；陣列：每個元素一個選項（可以是好幾個字）；空的：這個鍵不要副鍵。只有一個選項時長按放開就是它，好幾個時跳出一排、左右滑選。
+- 只寫要改的鍵，其餘用 App 的預設：大千第一排 1–0、其他排是實體鍵盤同位置的英文字母（ㄤ ㄝ ㄡ ㄥ 是全形標點）；QWERTY 第一排 1–0、其他排常用符號（中文版面用全形標點）。大千的鍵長按時，注音符號本身固定放在最後一個。
+- 每鍵最多 8 個選項、每個選項 1～8 個字、不能有空白；只能寫這個版面有的字鍵（大千是 41 個注音、其他是 a–z）。
+
 ## 新詞雷達
 
 [`radar.yml`](.github/workflows/radar.yml) 每週一自動執行：
@@ -171,9 +184,10 @@ App 內建、一律使用的資料也能線上更新（manifest 標 `"system": t
    - [`sources/mainland_terms_naer.txt`](sources/mainland_terms_naer.txt)：國家教育研究院〈兩岸對照名詞－計算機〉裡跟台灣譯名不同的大陸譯名。
 4. 維基條目標題轉成台灣正體，詞庫沒有、在台灣語料（PTT、公視…）也出現 3 次以上的才收（維基中文多半是大陸寫的，只在維基出現的不收）。
 5. taiwan-md：拿最新的 taiwan-md 跑 [`tools/mine_taiwan_md.py`](tools/mine_taiwan_md.py)，還沒看過的專有名詞（前 40 個）加進 [`sources/tw_md.txt`](sources/tw_md.txt)。
-6. 開 PR，把候選詞加進 [`sources/trendy.txt`](sources/trendy.txt)（新詞、維基條目）與 `sources/tw_md.txt`，PR 說明列出每個詞的次數與例句、taiwan-md 新詞要確認讀音的破音字。
+6. 英文新詞：中文句子裡夾的英文字（品牌、產品、縮寫），英文字典與 [`sources/en_extra.txt`](sources/en_extra.txt) 都沒有、至少 4 段文字、2 個來源（PTT 不同看板算不同來源）用過的，前 30 個加進 `en_extra.txt` 檔尾。
+7. 開 PR，把候選詞加進 [`sources/trendy.txt`](sources/trendy.txt)（新詞、維基條目）、`sources/tw_md.txt` 與 `sources/en_extra.txt`，PR 說明列出每個詞的次數與例句、taiwan-md 新詞要確認讀音的破音字。
 
-**審核**：在 PR 的 Files changed 刪掉不要的詞再合併（taiwan-md 不收的詞移到 `tw_md.txt` 檔尾的「# 不收：」，下次就不會再列）。合併後 [`packs.yml`](.github/workflows/packs.yml) 會重建 `trendy`（改到 `tw_md.txt` 也重建 `tw_md`）並發佈新版，手機隔天就會更新。
+**審核**：在 PR 的 Files changed 刪掉不要的詞再合併（taiwan-md 不收的詞移到 `tw_md.txt` 檔尾的「# 不收：」、英文不收的字移到 `en_extra.txt` 檔頭的「# 不收：」，下次就不會再列；英文字的大小寫寫錯的直接改）。合併後 [`packs.yml`](.github/workflows/packs.yml) 會重建 `trendy`（改到 `tw_md.txt` 也重建 `tw_md`、改到 `en_extra.txt` 也重建 `en`）並發佈新版，手機隔天就會更新。
 
 Threads：設定 repo secret `THREADS_ACCESS_TOKEN` 後，雷達會用熱搜字搜尋 Threads。Meta 要通過 `threads_keyword_search` 權限審核才搜得到公開貼文，沒通過只會搜到自己的貼文。
 

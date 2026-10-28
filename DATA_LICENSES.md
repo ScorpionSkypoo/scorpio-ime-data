@@ -23,6 +23,7 @@
 | 顏文字 | [w33ble/emoticon-data](https://github.com/w33ble/emoticon-data)（英文標籤對應成中文分類，略過含簡體字的） | MIT License，著作權聲明見 [`licenses/emoticon-data-MIT.txt`](licenses/emoticon-data-MIT.txt) |
 | 倉頡、速成碼表 | [Unicode Unihan](https://www.unicode.org/Public/UCD/latest/ucd/) `kCangjie` | Unicode License v3 |
 | 英文單字與字頻 | [hermitdave/FrequencyWords](https://github.com/hermitdave/FrequencyWords)（OpenSubtitles 2018） | CC BY-SA 4.0 |
+| 英文補充詞與顯示寫法 | 本專案人工整理（[`sources/en_extra.txt`](sources/en_extra.txt)）：新詞從下表的 PTT、Dcard 語料挑（只取詞與用過的人數）；[display] 的大寫寫法（人名、地名、縮寫）取自 [SCOWL](http://wordlist.aspell.net/) 的 Hunspell 英文字典（[wooorm/dictionaries](https://github.com/wooorm/dictionaries) 的 en、en-GB）裡只有大寫寫法、沒有小寫的字 | MIT License（同本專案）；取自 SCOWL 的寫法：著作權與授權聲明見 [`licenses/SCOWL-en-hunspell.txt`](licenses/SCOWL-en-hunspell.txt) |
 | 英文接續詞 | [OPUS OpenSubtitles v2018](https://opus.nlpl.eu/OpenSubtitles/corpus/version/OpenSubtitles) 英文對白統計 | 依 OPUS 規定引用：P. Lison and J. Tiedemann (2016), *OpenSubtitles2016: Extracting Large Parallel Corpora from Movie and TV Subtitles*, LREC 2016 |
 
 ## 接續詞語料
@@ -45,6 +46,7 @@
 | taiwan-md 兩岸用語對照（台灣說法） | [frank890417/taiwan-md](https://github.com/frank890417/taiwan-md) `data/terminology` | CC BY-SA 4.0 |
 | OpenCC 台灣詞語 | [BYVoid/OpenCC](https://github.com/BYVoid/OpenCC) `data/dictionary/TWPhrases.txt` | Apache License 2.0 |
 | 語料裡常出現的新詞 | 上表的 PTT、Dcard 語料與 taiwan-md 文章（CC BY-SA 4.0），`tools/mine_new_words.py` 挑候選後人工選 | 同各語料 |
+| 生活名詞（`[life]`） | 本專案依類別人工整理的日用品、小吃飲料，加上衛生福利部食品藥物管理署[食品營養成分資料庫](https://data.gov.tw/dataset/8543)的樣品名稱與俗名；用上表的 PTT、Dcard 語料確認用法（只取詞與篇數） | MIT License（同本專案）；食品名稱依[政府資料開放授權條款－第 1 版](https://data.gov.tw/license)，註明出處：衛生福利部食品藥物管理署 |
 
 ## 台灣百科專有名詞
 

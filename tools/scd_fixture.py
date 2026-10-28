@@ -4,7 +4,8 @@
 
 用法：scd_fixture.py <輸出目錄>
   輸出 words_fixture.tsv（reading、toneless、word、score、initials、finals，Tab 分隔，順序即原本的 rowid 順序）
-  與 words_fixture.scd（scd.py 對同一份資料寫出的檔案）。把兩個檔放進 App 的 app/src/test/resources/。
+  與 words_fixture.scd（scd.py 對同一份資料寫出的檔案），以及有顯示寫法（e.disp）的英文詞庫 en_fixture.scd。
+  把這些檔放進 App 的 app/src/test/resources/。
 資料刻意包含：同分（比同分時的先後）、補充平面的字（surrogate pair）、超過 PREFIX_HEAVY 筆的熱門前綴、
 空的聲母或韻母（_）、需要 JSON 跳脫的 meta。
 """
@@ -48,6 +49,13 @@ def main():
     with open(f"{out_dir}/words_fixture.scd", "wb") as f:
         f.write(data)
     print(f"words_fixture.scd {len(data)} bytes，{len(rs)} 筆")
+    en = scd.Writer({"id": "en", "group": "en", "version": "2026.1.1"}).add(scd.English(
+        [("dior", 2900), ("dirt", 3100), ("iphone", 3300), ("ipod", 3000), ("the", 6000)],
+        [("the", "iphone", 10), ("the", "dirt", 5)],
+        {"dior": "Dior", "iphone": "iPhone"},
+    )).build()
+    with open(f"{out_dir}/en_fixture.scd", "wb") as f:
+        f.write(en)
 
 
 if __name__ == "__main__":

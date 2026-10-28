@@ -81,6 +81,7 @@ for p in packs:
         "bundled": p.get("bundled", True),
         "default": p.get("default", True),
         "category": p.get("category", ""),
+        "lang": build_scd.pack_lang(pid),
     }
     if system:
         entries[pid]["system"] = True

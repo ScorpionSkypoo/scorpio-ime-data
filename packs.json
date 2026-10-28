@@ -1,5 +1,5 @@
 {
-  "_說明": "所有資料包的名稱、說明、來源與授權。group：words＝增加打得出的詞；bigram＝只影響詞與詞的接續（整句選字、選完字後的聯想）；kaomoji＝顏文字。version 只是第一次的預設值，之後每次建置由 tools/build.sh 以日期版本號寫進 base 詞庫與 manifest.json。bundled：是否內建在 App（false＝只能線上安裝）；default：預設要不要開。category：設定頁的分組（basic 基本、places 地名與地標、symbols 表情符號、terms 專業術語、bigram 接續詞語料）。",
+  "_說明": "所有資料包的名稱、說明、來源與授權。group：words＝增加打得出的詞；bigram＝只影響詞與詞的接續（整句選字、選完字後的聯想）；kaomoji＝顏文字。version 只是第一次的預設值，之後每次建置由 tools/build.sh 以日期版本號寫進 base 詞庫與 manifest.json。bundled：是否內建在 App（false＝只能線上安裝）；default：預設要不要開。category：設定頁的分組（basic 基本、places 地名與地標、symbols 表情符號、terms 專業術語、bigram 接續詞語料）。lang：這個資料包是哪個語言用的（zh、en、ja…，沒寫就是 zh），App 之後在設定頁照語言分組、只列有安裝的語言。",
   "packs": [
     {
       "id": "core",

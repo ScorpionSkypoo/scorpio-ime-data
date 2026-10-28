@@ -71,6 +71,7 @@ jobs:
             echo "$CHANGED" | grep -qx 'sources/tw_md.txt' && P="$P tw_md"
             echo "$CHANGED" | grep -qx 'sources/tw_life.txt' && P="$P tw_life"
             echo "$CHANGED" | grep -qx 'sources/core_fixes.txt' && P="$P core tw_places"
+            echo "$CHANGED" | grep -qx 'sources/en_extra.txt' && P="$P en"
             for f in $(echo "$CHANGED" | grep -E '^(plugins|layouts|config)/.+\.json$'); do
               [ -f "$f" ] && P="$P $(basename "$f" .json)"
             done
