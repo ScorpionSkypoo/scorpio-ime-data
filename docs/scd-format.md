@@ -12,7 +12,7 @@ App 內建與線上下載的詞庫都是 SCD：唯讀的二進位檔，App 用 `
 | 位置 | 內容 |
 |---|---|
 | 0–31 | 檔頭：magic `SCD1`、版本（1）、meta 位置、meta 長度、區段目錄位置、區段數、檔案長度、保留 |
-| meta | JSON（UTF-8，鍵排序、無空白）：`id`、`group`、`version`、`name`、`source`、`license`、`bundled`、`default`、`category`、`sort`、`rows`（各表筆數） |
+| meta | JSON（UTF-8，鍵排序、無空白）：`id`、`group`、`version`、`name`、`source`、`license`、`bundled`、`default`、`category`、`lang`（哪個語言用的：zh、en…，沒有就當 zh）、`sort`、`rows`（各表筆數） |
 | 區段目錄 | 每筆 32 bytes：名稱 24 bytes（NUL 補齊）＋位置＋長度 |
 | 區段 | 8 bytes 對齊；字串表 `str.off`／`str.chr`（UTF-16），其餘是 u32／f64 陣列或索引（`.k` 鍵、`.s` 起點、`.p` 資料列） |
 

@@ -20,14 +20,19 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 不是資料包、跟著 App 走的資料（設定頁不列為詞庫）
 BUILTIN = {
-    "emoji": {"name": "Emoji", "source": "Unicode CLDR 繁中註解", "license": "Unicode License v3"},
-    "en": {"name": "英文", "source": "英文詞頻與 OpenSubtitles 口語接續", "license": "見 DATA_LICENSES.md"},
-    "cangjie": {"name": "倉頡／速成", "source": "倉頡碼表", "license": "見 DATA_LICENSES.md"},
+    "emoji": {"name": "Emoji", "source": "Unicode CLDR 繁中註解", "license": "Unicode License v3", "lang": "zh"},
+    "en": {"name": "英文", "source": "英文詞頻與 OpenSubtitles 口語接續", "license": "見 DATA_LICENSES.md", "lang": "en"},
+    "cangjie": {"name": "倉頡／速成", "source": "倉頡碼表", "license": "見 DATA_LICENSES.md", "lang": "zh"},
 }
 
 
 def packs_json():
     return {p["id"]: p for p in json.load(open(f"{ROOT}/packs.json", encoding="utf-8"))["packs"]}
+
+
+def pack_lang(pid):
+    """資料包是哪個語言用的（設定頁之後照語言分組）：packs.json 的 lang，App 內建的見 BUILTIN，沒寫就是 zh"""
+    return packs_json().get(pid, {}).get("lang") or BUILTIN.get(pid, {}).get("lang") or "zh"
 
 
 BASE_MODE = False
@@ -66,6 +71,7 @@ def pack_meta(db, pid, version):
         "bundled": p.get("bundled", True),
         "default": p.get("default", True),
         "category": p.get("category", ""),
+        "lang": pack_lang(pid),
         "version": version,
     }
     return meta

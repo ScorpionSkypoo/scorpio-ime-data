@@ -40,7 +40,7 @@ App 內建、一律使用的資料也能線上更新（manifest 標 `"system": t
 
 `tools/make_configs.py` 照 App 的規則檢查，不合就中止、不發佈。
 
-`packs.json` 的 `bundled: false` 表示 App 不內建、只能在「字典與學習 → 可下載的詞庫」打開開關下載；`default: false` 表示預設不開。
+`packs.json` 的 `bundled: false` 表示 App 不內建、只能在「字典與學習 → 可下載的詞庫」打開開關下載；`default: false` 表示預設不開。`lang` 是這個資料包給哪個語言用的（`zh`、`en`、`ja`…，沒寫就是 `zh`；App 內建的 en 是 `en`），寫進資料包 meta 與 manifest，之後設定頁照語言分組、只列有安裝輸入法的語言。
 
 每個資料包是 gzip 壓縮的 SCD 二進位詞庫（`<id>-<版本>.scd.gz`），放在 Release `packs-<版本>`；App 解壓後直接 mmap 查詢，不經 SQLite。版本號是建置時間（`2026.10.23.1530`），App 逐段比數字大小。格式見 [`docs/scd-format.md`](docs/scd-format.md)、[`tools/scd.py`](tools/scd.py)；建置用的 SQLite 基底詞庫（Release `base` 的 `scorpio_*.db.gz`）轉成 SCD 的流程在 [`tools/build_scd.py`](tools/build_scd.py)、[`tools/make_packs.py`](tools/make_packs.py)，`tools/verify_scd.py` 會逐鍵比對 SCD 與 SQLite 的查詢結果。
 
