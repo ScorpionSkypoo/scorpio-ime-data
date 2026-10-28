@@ -71,6 +71,14 @@ def pack_meta(db, pid, version):
     return meta
 
 
+def english_display(db):
+    """英文字的顯示寫法（apply_en_extra.py 寫的 english_display 表；舊的 base 沒有這個表）"""
+    try:
+        return dict(db.execute("SELECT word, display FROM english_display WHERE display != word"))
+    except sqlite3.OperationalError:
+        return {}
+
+
 def word_rows(db, where, args=()):
     return db.execute(f"SELECT reading, toneless, word, score, initials, finals FROM {where} ORDER BY rowid", args).fetchall()
 
@@ -91,6 +99,7 @@ def build(pid, db, bdb, version):
             w.add(scd.English(
                 db.execute("SELECT word, score FROM english_dict ORDER BY word").fetchall(),
                 db.execute("SELECT prev, next, score FROM english_bigram ORDER BY rowid").fetchall(),
+                english_display(db),
             ))
         else:
             w.add(scd.Cangjie(db.execute("SELECT code, quick, char, freq FROM cangjie ORDER BY code, freq DESC").fetchall()))

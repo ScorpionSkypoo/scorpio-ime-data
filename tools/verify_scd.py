@@ -13,6 +13,7 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import scd  # noqa: E402
+import build_scd  # noqa: E402
 
 dict_db, bigram_db, scd_dir = sys.argv[1:4]
 only = sys.argv[4:]
@@ -98,6 +99,10 @@ def verify_simple(r, pid):
         words = [r.s(i) for i in r.arr("e.word", "I")]
         if list(zip(words, r.arr("e.score", "i"))) != src.execute("SELECT word, score FROM english_dict ORDER BY word").fetchall():
             fail("英文單字不同")
+        disp = build_scd.english_display(src)
+        if (r.arr("e.disp", "I") is not None) != bool(disp) or \
+                (disp and [r.s(i) for i in r.arr("e.disp", "I")] != [disp.get(w, w) for w in words]):
+            fail("英文顯示寫法不同")
         nxt = r.arr("eb.next", "I")
         for k, ids in r.index("eb.pv").items():
             exp = [x for (x,) in src.execute("SELECT next FROM english_bigram WHERE prev = ? ORDER BY score DESC", (k,))]

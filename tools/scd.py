@@ -198,26 +198,31 @@ class Bigram:
 
 
 class English:
-    """英文單字（rows：(word, score) 依 ORDER BY word）與英文接續（brows：(prev, next, score) 依 rowid）"""
+    """英文單字（rows：(word, score) 依 ORDER BY word）與英文接續（brows：(prev, next, score) 依 rowid）
+
+    display：{小寫的字: 顯示的寫法}（iPhone、YouTube、Dior）。有的話多寫一個 e.disp（每列一個字串，沒有特別寫法的就是字本身）；
+    沒有就不寫，跟舊版的檔案一樣。舊版 App 不認得 e.disp，照舊顯示小寫"""
     NAME = "e"
 
-    def __init__(self, rows, brows):
-        self.rs, self.bs = rows, brows
+    def __init__(self, rows, brows, display=None):
+        self.rs, self.bs, self.disp = rows, brows, display or {}
 
     def row_count(self):
         return len(self.rs)
 
     def strings(self):
-        return {r[0] for r in self.rs} | {s for r in self.bs for s in (r[0], r[1])}
+        return {r[0] for r in self.rs} | {s for r in self.bs for s in (r[0], r[1])} | set(self.disp.values())
 
     def sections(self, sid):
         n = len(self.bs)
         keys, groups = group(n, lambda i: self.bs[i][0], lambda i: (-self.bs[i][2], i))
-        return [
+        out = [
             ("e.word", pack("I", [sid[r[0]] for r in self.rs])),
             ("e.score", pack("i", [r[1] for r in self.rs])),
-            ("eb.next", pack("I", [sid[r[1]] for r in self.bs])),
-        ] + index_sections("eb.pv", sid, keys, groups)
+        ]
+        if self.disp:
+            out.append(("e.disp", pack("I", [sid[self.disp.get(r[0], r[0])] for r in self.rs])))
+        return out + [("eb.next", pack("I", [sid[r[1]] for r in self.bs]))] + index_sections("eb.pv", sid, keys, groups)
 
 
 class Cangjie:

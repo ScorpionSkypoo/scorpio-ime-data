@@ -23,6 +23,7 @@
 | 顏文字 | [w33ble/emoticon-data](https://github.com/w33ble/emoticon-data)（英文標籤對應成中文分類，略過含簡體字的） | MIT License，著作權聲明見 [`licenses/emoticon-data-MIT.txt`](licenses/emoticon-data-MIT.txt) |
 | 倉頡、速成碼表 | [Unicode Unihan](https://www.unicode.org/Public/UCD/latest/ucd/) `kCangjie` | Unicode License v3 |
 | 英文單字與字頻 | [hermitdave/FrequencyWords](https://github.com/hermitdave/FrequencyWords)（OpenSubtitles 2018） | CC BY-SA 4.0 |
+| 英文補充詞與顯示寫法 | 本專案人工整理（[`sources/en_extra.txt`](sources/en_extra.txt)）：新詞從下表的 PTT、Dcard 語料挑（只取詞與用過的人數）；[display] 的大寫寫法（人名、地名、縮寫）取自 [SCOWL](http://wordlist.aspell.net/) 的 Hunspell 英文字典（[wooorm/dictionaries](https://github.com/wooorm/dictionaries) 的 en、en-GB）裡只有大寫寫法、沒有小寫的字 | MIT License（同本專案）；取自 SCOWL 的寫法：著作權與授權聲明見 [`licenses/SCOWL-en-hunspell.txt`](licenses/SCOWL-en-hunspell.txt) |
 | 英文接續詞 | [OPUS OpenSubtitles v2018](https://opus.nlpl.eu/OpenSubtitles/corpus/version/OpenSubtitles) 英文對白統計 | 依 OPUS 規定引用：P. Lison and J. Tiedemann (2016), *OpenSubtitles2016: Extracting Large Parallel Corpora from Movie and TV Subtitles*, LREC 2016 |
 
 ## 接續詞語料

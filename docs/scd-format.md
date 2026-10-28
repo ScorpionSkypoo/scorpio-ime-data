@@ -25,7 +25,7 @@ App 內建與線上下載的詞庫都是 SCD：唯讀的二進位檔，App 用 `
 |---|---|
 | `w` | 詞（主詞庫、附加詞庫、匯入詞庫）：reading、toneless、word、score，索引 `w.tl`（clustered）、`w.rd`、`w.in`、`w.fn`、`w.wd`、`w.tp`（熱門前綴預先算好前 16 名） |
 | `b` | 詞與詞的接續（ln P(next｜prev)） |
-| `e` | 英文單字與英文接續 |
+| `e` | 英文單字與英文接續：`e.word`（小寫，依字串順序）、`e.score`、`e.disp`（顯示的寫法，iPhone、Paris；可以沒有，舊版 App 不讀）、`eb.next`，索引 `eb.pv` |
 | `cj` | 倉頡碼表 |
 | `em` | Emoji（關鍵字、分類） |
 | `k` | 顏文字（讀音、分類） |

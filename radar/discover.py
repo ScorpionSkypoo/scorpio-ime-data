@@ -13,9 +13,12 @@
 維基百科的新條目、熱門條目（轉成台灣正體）：詞庫沒有、在台灣語料（PTT、公視、Threads…）也出現至少 WIKI_MIN 次的才收，
 加進 trendy.txt；維基中文多半是大陸寫的，只在維基出現的不收。
 --twmd：tools/mine_taiwan_md.py 挑出的 taiwan-md 新詞候選（還沒看過的），前 TWMD_TOP 個加進 sources/tw_md.txt。
+--en-apply：中文句子裡夾的英文字（品牌、產品、縮寫），英文字典（english_dict）與 sources/en_extra.txt 都沒有、
+至少 EN_MIN_DOCS 段文字、EN_MIN_GROUPS 個來源（PTT 不同看板算不同來源）用過的，前 EN_TOP 個加進 en_extra.txt 的 [words]，
+分數先給 EN_SCORE（PTT／Dcard 約 10 個人用過的程度），審核時可以改。
 
 用法：discover.py <texts.jsonl> <scorpio_dict.db（解壓後）> <報告 report.md> [--apply sources/trendy.txt] [--top 60]
-                   [--twmd work/twmd.tsv --twmd-apply sources/tw_md.txt]
+                   [--twmd work/twmd.tsv --twmd-apply sources/tw_md.txt] [--en-apply sources/en_extra.txt]
   --apply：把候選詞加進 trendy.txt 的 [words]（附上日期註解），給 PR 審核時刪掉不要的
 """
 import argparse
@@ -48,6 +51,16 @@ END_STOP = EDGE_STOP | set("很太超更最沒不你我他她它們人部種次�
 MIN_LEN, MAX_LEN = 2, 5
 WIKI_MIN = 3
 TWMD_TOP = 40
+# 英文字：中文句子裡夾的（純字母，可以有 '；網址、帳號、檔名的一部分不算）
+RE_EN = re.compile(r"(?<![A-Za-z0-9@./_#'-])([A-Za-z]+(?:'[A-Za-z]+)?)(?![A-Za-z0-9@_/'-])")
+RE_URL = re.compile(r"https?://\S+|www\.\S+|\S+@\S+")
+RE_HAN = re.compile(r"[一-鿿]")
+# 笑聲、重複字母（XDDD、wwww、QQQ）
+RE_EN_REP = re.compile(r"(.)\1\1|^(x+d+|xd(xd)+|w+|z+|q+|o+x+)$", re.I)
+EN_MIN_DOCS, EN_MIN_GROUPS, EN_TOP = 4, 2, 30
+# 三個字母以下的全大寫縮寫多半意思不明（ABC、LH），要更多段文字用過
+EN_SHORT_CAPS_DOCS = 10
+EN_SCORE = 3347
 RE_TITLE = re.compile(r"[一-鿿]{2,8}")
 SOURCE_NAMES = {"trends": "Google Trends 熱搜", "trends-news": "Google Trends 新聞標題", "pts": "公視新聞",
                 "threadscount": "Threads 熱門話題統計", "threads": "Threads", "wiki-new": "維基新條目", "wiki-top": "維基熱門條目"}
@@ -62,6 +75,54 @@ def load_vocab(db_path):
         except sqlite3.OperationalError:
             pass
     return vocab
+
+
+def load_english(db_path, extra_path):
+    """英文字典（小寫）加上 en_extra.txt 已經收的字（[display]、[words]）與「# 不收：」那幾行列的字（審核時刪掉、不想再看到的）"""
+    words = set()
+    try:
+        words.update(w for (w,) in sqlite3.connect(db_path).execute("SELECT word FROM english_dict"))
+    except sqlite3.OperationalError:
+        pass
+    if extra_path:
+        for line in open(extra_path, encoding="utf-8"):
+            line = line.strip()
+            if line.startswith("# 不收："):
+                words.update(w.lower() for w in line[len("# 不收："):].split())
+            elif line and not line.startswith(("#", "[")):
+                words.add(line.split("\t")[0].lower())
+    return words
+
+
+def english_candidates(texts, english):
+    """texts：(來源, 文字)。回傳 [(段數, 來源數, 寫法, 例句)]，依段數排"""
+    docs, groups, forms, example = Counter(), defaultdict(set), defaultdict(Counter), {}
+    for src, text in texts:
+        seen = set()
+        for line in RE_URL.sub(" ", text).splitlines():
+            if not RE_HAN.search(line):
+                continue
+            for m in RE_EN.finditer(line):
+                w = m.group(1)
+                k = w.lower()
+                if len(w) < 2 or k in english or RE_EN_REP.search(k):
+                    continue
+                forms[k][w] += 1
+                if k not in seen:
+                    seen.add(k)
+                    docs[k] += 1
+                    groups[k].add(src)
+                    example.setdefault(k, line[max(0, m.start() - 12): m.end() + 12].strip())
+    out = []
+    for k, n in docs.items():
+        w = forms[k].most_common(1)[0][0]
+        if n < EN_MIN_DOCS or len(groups[k]) < EN_MIN_GROUPS:
+            continue
+        if w.isupper() and len(w) <= 3 and n < EN_SHORT_CAPS_DOCS:
+            continue
+        out.append((n, len(groups[k]), w, example[k]))
+    out.sort(key=lambda x: (-x[0], -x[1], x[2]))
+    return out[:EN_TOP]
 
 
 def splits_into_known(w, vocab):
@@ -89,6 +150,7 @@ def main():
     ap.add_argument("--opencc-twphrases", help="OpenCC GitHub master 最新的 TWPhrases.txt（左欄是大陸用語）")
     ap.add_argument("--twmd", help="tools/mine_taiwan_md.py 的輸出 tsv")
     ap.add_argument("--twmd-apply", help="sources/tw_md.txt")
+    ap.add_argument("--en-apply", help="sources/en_extra.txt：英文新詞加進 [words]")
     args = ap.parse_args()
 
     vocab = load_vocab(args.dict_db)
@@ -112,7 +174,7 @@ def main():
             if line and not line.startswith(("#", "[")):
                 vocab.add(line.split()[0])
 
-    runs, trend_topics, wiki = [], [], []
+    runs, trend_topics, wiki, en_texts = [], [], [], []
     sources = Counter()
     to_tw = _s2twp.convert if "_s2twp" in globals() else (lambda t: t)
     for line in open(args.texts, encoding="utf-8"):
@@ -125,6 +187,8 @@ def main():
             continue
         if src == "trends":
             trend_topics.append(d["text"].replace(" ", ""))
+        # 英文字的來源：PTT 每個看板各算一個（ptt:Gossiping 與 ptt-search:Gossiping 同一個）
+        en_texts.append((src.split(":")[-1] if src.startswith("ptt") else src, d["text"]))
         runs.extend(RE_RUN.findall(d["text"]))
 
     ngram = Counter()
@@ -203,6 +267,8 @@ def main():
                 twmd.append(f)
         twmd = twmd[:TWMD_TOP]
 
+    en_new = english_candidates(en_texts, load_english(args.dict_db, args.en_apply)) if args.en_apply else []
+
     today = time.strftime("%Y-%m-%d")
     with open(args.report, "w", encoding="utf-8") as f:
         f.write(f"## 新詞雷達 {today}\n\n")
@@ -219,6 +285,11 @@ def main():
                     "破音字欄有字的要確認讀音（讀音不對就在詞後面寫正確讀音）。\n\n| 詞 | 推得的讀音 | 篇數 | 破音字 |\n|---|---|---:|---|\n")
             for x in twmd:
                 f.write(f"| {x[0]} | {x[1]} | {x[3]} | {x[5]} |\n")
+        if en_new:
+            f.write(f"\n### 英文新詞\n\n中文句子裡夾的英文字，英文字典沒有的，**已經加進 `sources/en_extra.txt` 的 [words]**（分數先給 {EN_SCORE}）。"
+                    "寫法照最常見的大小寫；不要的刪掉（或移到檔頭的「# 不收：」那行，以後就不會再列），寫法不對的直接改（App 照這裡的寫法顯示）。\n\n| 寫法 | 段數 | 來源數 | 例句 |\n|---|---:|---:|---|\n")
+            for n, g, w, ex in en_new:
+                f.write(f"| {w} | {n} | {g} | {ex.replace('|', '｜')} |\n")
         if trend_new:
             f.write("\n### Google Trends 熱搜中詞庫沒有的詞\n\n多半是人名或事件，**沒有自動加入**；要收的話手動加到 `sources/trendy.txt`。\n\n")
             f.write("、".join(trend_new) + "\n")
@@ -241,6 +312,11 @@ def main():
         lines[at:at] = [f"# 新詞雷達 {today}"] + [x[0] for x in twmd]
         open(args.twmd_apply, "w", encoding="utf-8").write("\n".join(lines) + "\n")
         print(f"已加入 {args.twmd_apply}：{len(twmd)} 個")
+    if args.en_apply and en_new:
+        text = open(args.en_apply, encoding="utf-8").read().rstrip("\n")
+        block = [f"# 新詞雷達 {today}"] + [f"{w}\t{EN_SCORE}" for _, _, w, _ in en_new]
+        open(args.en_apply, "w", encoding="utf-8").write(text + "\n" + "\n".join(block) + "\n")
+        print(f"已加入 {args.en_apply}：{len(en_new)} 個")
 
 
 if __name__ == "__main__":

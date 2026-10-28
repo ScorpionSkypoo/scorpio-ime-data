@@ -24,7 +24,7 @@ App 內建、一律使用的資料也能線上更新（manifest 標 `"system": t
 |---|---|---|
 | `core` | 主詞庫（小麥注音），約 6 MB，有改才發佈 | base |
 | `emoji` | Emoji 關鍵字與面板分類 | `emoji/zh_Hant.xml`（CLDR 繁中註解）、`emoji/emoji-test.txt`（Unicode） |
-| `en` | 英文詞頻與接續 | base |
+| `en` | 英文詞頻與接續，加上補充詞與顯示寫法（iPhone、Paris） | base、[`sources/en_extra.txt`](sources/en_extra.txt)（改了會自動重建） |
 | `cangjie_table` | 倉頡／速成碼表（SCD 的 id 是 `cangjie`，跟倉頡版面同名，建置時用這個名字區分） | base |
 
 例：Unicode 出新版 Emoji 時，換掉 `emoji/` 的兩個檔，手動執行「建置並發佈資料包」填 `emoji`。
@@ -171,9 +171,10 @@ App 內建、一律使用的資料也能線上更新（manifest 標 `"system": t
    - [`sources/mainland_terms_naer.txt`](sources/mainland_terms_naer.txt)：國家教育研究院〈兩岸對照名詞－計算機〉裡跟台灣譯名不同的大陸譯名。
 4. 維基條目標題轉成台灣正體，詞庫沒有、在台灣語料（PTT、公視…）也出現 3 次以上的才收（維基中文多半是大陸寫的，只在維基出現的不收）。
 5. taiwan-md：拿最新的 taiwan-md 跑 [`tools/mine_taiwan_md.py`](tools/mine_taiwan_md.py)，還沒看過的專有名詞（前 40 個）加進 [`sources/tw_md.txt`](sources/tw_md.txt)。
-6. 開 PR，把候選詞加進 [`sources/trendy.txt`](sources/trendy.txt)（新詞、維基條目）與 `sources/tw_md.txt`，PR 說明列出每個詞的次數與例句、taiwan-md 新詞要確認讀音的破音字。
+6. 英文新詞：中文句子裡夾的英文字（品牌、產品、縮寫），英文字典與 [`sources/en_extra.txt`](sources/en_extra.txt) 都沒有、至少 4 段文字、2 個來源（PTT 不同看板算不同來源）用過的，前 30 個加進 `en_extra.txt` 檔尾。
+7. 開 PR，把候選詞加進 [`sources/trendy.txt`](sources/trendy.txt)（新詞、維基條目）、`sources/tw_md.txt` 與 `sources/en_extra.txt`，PR 說明列出每個詞的次數與例句、taiwan-md 新詞要確認讀音的破音字。
 
-**審核**：在 PR 的 Files changed 刪掉不要的詞再合併（taiwan-md 不收的詞移到 `tw_md.txt` 檔尾的「# 不收：」，下次就不會再列）。合併後 [`packs.yml`](.github/workflows/packs.yml) 會重建 `trendy`（改到 `tw_md.txt` 也重建 `tw_md`）並發佈新版，手機隔天就會更新。
+**審核**：在 PR 的 Files changed 刪掉不要的詞再合併（taiwan-md 不收的詞移到 `tw_md.txt` 檔尾的「# 不收：」、英文不收的字移到 `en_extra.txt` 檔頭的「# 不收：」，下次就不會再列；英文字的大小寫寫錯的直接改）。合併後 [`packs.yml`](.github/workflows/packs.yml) 會重建 `trendy`（改到 `tw_md.txt` 也重建 `tw_md`、改到 `en_extra.txt` 也重建 `en`）並發佈新版，手機隔天就會更新。
 
 Threads：設定 repo secret `THREADS_ACCESS_TOKEN` 後，雷達會用熱搜字搜尋 Threads。Meta 要通過 `threads_keyword_search` 權限審核才搜得到公開貼文，沒通過只會搜到自己的貼文。
 
