@@ -76,6 +76,19 @@ def validate_keys(k, path, engine):
     assert sorted(letters) == [chr(c) for c in range(ord("a"), ord("z") + 1)], f"{path}：字鍵要剛好是 a–z 各一次"
 
 
+def validate_long(long, path, engine):
+    """長按副鍵（選填，規則跟 App 的 LongPressKeys.parse 一樣，見 README〈長按副鍵〉）"""
+    assert isinstance(long, dict), f"{path}：long 要是物件"
+    keys = set(SYMBOLS) if engine == "dachen" else {chr(c) for c in range(ord("a"), ord("z") + 1)}
+    for k, v in long.items():
+        assert k in keys, f"{path}：long 的「{k}」不是這個版面的字鍵"
+        opts = list(v) if isinstance(v, str) else v
+        assert isinstance(opts, list) and len(opts) <= 8, f"{path}：long 的「{k}」要是字串或陣列，最多 8 個選項"
+        for o in opts:
+            assert isinstance(o, str) and 1 <= len(o) <= 8 and not any(c.isspace() or ord(c) < 32 for c in o), \
+                f"{path}：long 的「{k}」選項要是 1～8 個字、不能有空白"
+
+
 def validate(p, path, pack_ids):
     assert p.get("schema", 1) <= SCHEMA, f"{path}：schema 太新"
     for key in ("id", "name", "engine", "language", "languageName"):
@@ -89,6 +102,8 @@ def validate(p, path, pack_ids):
     if p["engine"] == "dachen":
         assert "keys" in p, f"{path}：大千的版面要寫 keys（內建的 10×4 在 App 裡）"
         assert p.get("minAppVersion", 0) >= MIN_APP_VERSION_DACHEN, f"{path}：大千的版面 minAppVersion 至少 {MIN_APP_VERSION_DACHEN}"
+    if "long" in p:
+        validate_long(p["long"], path, p["engine"])
     for r in p.get("requires", []):
         assert r in pack_ids, f"{path}：requires 的 {r} 不在 packs.json"
     if "keys" in p:
