@@ -13,6 +13,7 @@
 import re
 import sqlite3
 import sys
+from collections import Counter
 
 dict_db, path = sys.argv[1:3]
 RE_WORD = re.compile(r"^[A-Za-z]+(?:'[A-Za-z]+)?$")
@@ -36,8 +37,8 @@ for n, line in enumerate(open(path, encoding="utf-8"), 1):
     else:
         sys.exit(f"{path}:{n} 格式不對（[display] 一行一個字；[words] 寫法<TAB>分數）：{line!r}")
 
-keys = [w.lower() for w in display] + [w.lower() for w, _ in words]
-dup = {k for k in keys if keys.count(k) > 1}
+keys = Counter([w.lower() for w in display] + [w.lower() for w, _ in words])
+dup = {k for k, n in keys.items() if n > 1}
 if dup:
     sys.exit(f"重複的字：{' '.join(sorted(dup))}")
 
