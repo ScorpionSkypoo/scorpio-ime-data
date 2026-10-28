@@ -46,6 +46,7 @@
 | taiwan-md 兩岸用語對照（台灣說法） | [frank890417/taiwan-md](https://github.com/frank890417/taiwan-md) `data/terminology` | CC BY-SA 4.0 |
 | OpenCC 台灣詞語 | [BYVoid/OpenCC](https://github.com/BYVoid/OpenCC) `data/dictionary/TWPhrases.txt` | Apache License 2.0 |
 | 語料裡常出現的新詞 | 上表的 PTT、Dcard 語料與 taiwan-md 文章（CC BY-SA 4.0），`tools/mine_new_words.py` 挑候選後人工選 | 同各語料 |
+| 生活名詞（`[life]`） | 本專案依類別人工整理的日用品、小吃飲料，加上衛生福利部食品藥物管理署[食品營養成分資料庫](https://data.gov.tw/dataset/8543)的樣品名稱與俗名；用上表的 PTT、Dcard 語料確認用法（只取詞與篇數） | MIT License（同本專案）；食品名稱依[政府資料開放授權條款－第 1 版](https://data.gov.tw/license)，註明出處：衛生福利部食品藥物管理署 |
 
 ## 台灣百科專有名詞
 
