@@ -12,7 +12,7 @@
 # 只收純英文字母（可以有 '）：App 的英文鍵盤打數字、符號會直接送出，含數字的型號打不出來
 # 新詞雷達（radar/discover.py --en-apply）每週把中文句子裡夾的新英文字加到檔尾（分數先給 3347）；
 # 審核時不要的字可以移到下面這行（空白分隔），以後就不會再列
-# 不收：
+# 不收：XDGEE Teentop hihihihehehe iamshana hvariables psychohero LL VV Re
 
 [display]
 OK
@@ -5857,3 +5857,25 @@ Gogoro	3347
 OpenAI	3347
 Shopee	3347
 Xiaomi	3347
+# 新詞雷達 2026-11-01
+PTT	3347
+ETF	3347
+YT	3347
+GOOG	3347
+DPP	3347
+CPI	3347
+eSIM	3347
+FOMO	3347
+ETtoday	3347
+TVBS	3347
+SOXL	3347
+GPT	3347
+BTC	3347
+QE	3347
+MyVideo	3347
+Grok	3347
+KPI	3347
+SNS	3347
+SpaceX	3347
+DeepSeek	3347
+NVDA	3347
