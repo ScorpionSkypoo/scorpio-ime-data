@@ -70,7 +70,8 @@ def trends():
 RE_LINK = re.compile(r'<div class="title">\s*<a href="(/bbs/[^"]+\.html)">')
 RE_PREV = re.compile(r'<a class="btn wide" href="(/bbs/[^"]+/index\d+\.html)">&lsaquo; 上頁</a>')
 RE_MAIN = re.compile(r'<div id="main-content"[^>]*>(.*?)<span class="f2">※ 發信站', re.S)
-RE_META = re.compile(r'<div class="article-metaline.*?</div>\s*</div>|<div class="article-metaline-right.*?</div>\s*</div>', re.S)
+# 文章標頭（作者、看板、標題、時間）：每行是一個 div 包兩個 span；作者帳號、看板名不能進語料，標題留著
+RE_META = re.compile(r'<div class="article-metaline(?:-right)?"><span class="article-meta-tag">([^<]*)</span><span class="article-meta-value">(.*?)</span></div>', re.S)
 RE_PUSH = re.compile(r'<span class="[^"]*push-content">:?\s*(.*?)</span>', re.S)
 RE_TAG = re.compile(r"<[^>]+>")
 RE_STAMP = re.compile(r"/M\.(\d{10})\.")
@@ -134,7 +135,7 @@ def article(url):
     out = []
     m = RE_MAIN.search(page)
     if m:
-        body = RE_META.sub("", m.group(1))
+        body = RE_META.sub(lambda t: t.group(2) + "\n" if t.group(1) == "標題" else "", m.group(1))
         body = clean(body.split('<div class="push">')[0])
         # 去掉引用（: 開頭）與簽名檔
         lines = [l for l in body.splitlines() if l.strip() and not l.startswith((":", "※", "--"))]

@@ -19,7 +19,7 @@
 
 用法：discover.py <texts.jsonl> <scorpio_dict.db（解壓後）> <報告 report.md> [--apply sources/trendy.txt] [--top 60]
                    [--twmd work/twmd.tsv --twmd-apply sources/tw_md.txt] [--en-apply sources/en_extra.txt]
-  --apply：把候選詞加進 trendy.txt 的 [words]（附上日期註解），給 PR 審核時刪掉不要的
+  --apply：把候選詞加進 trendy.txt 的 [words]（附上日期註解），給 PR 審核時刪掉不要的；刪掉的詞寫進「# 不收：」那行，下次就不會再列
 """
 import argparse
 import json
@@ -47,7 +47,9 @@ RE_RUN = re.compile(r"[一-鿿]{2,}")
 # 開頭或結尾是這些字的多半是片語碎片（「的人」「是不」），直接排除
 EDGE_STOP = set("的了是在和與及或而就也都又還才把被讓給對向從到於之其這那個些啊吧呢嗎啦喔哦耶欸囉咧嘛")
 # 只排除結尾：副詞、代名詞、量詞收尾的多半是「真的很」「幫你」「一堆人」「第二部」這種碎片
-END_STOP = EDGE_STOP | set("很太超更最沒不你我他她它們人部種次樣下上中裡著過嗎")
+END_STOP = EDGE_STOP | set("很太超更最沒不你我他她它們人部種次樣下上中裡著過嗎後")
+# 只排除開頭：「很正常」「會贏」「我猜」「部電影」「場比賽」這種副詞、代名詞、量詞開頭的片語
+START_STOP = EDGE_STOP | set("很會該只我你部場首件隻條")
 MIN_LEN, MAX_LEN = 2, 5
 WIKI_MIN = 3
 TWMD_TOP = 40
@@ -171,7 +173,10 @@ def main():
     if args.apply:
         for line in open(args.apply, encoding="utf-8"):
             line = line.strip()
-            if line and not line.startswith(("#", "[")):
+            # 「# 不收：」是審核時刪掉的詞，跟已經收的一樣不再列出
+            if line.startswith("# 不收："):
+                vocab.update(line[len("# 不收："):].split())
+            elif line and not line.startswith(("#", "[")):
                 vocab.add(line.split()[0])
 
     runs, trend_topics, wiki, en_texts = [], [], [], []
@@ -216,7 +221,7 @@ def main():
     for g, f in ngram.items():
         if not (MIN_LEN <= len(g) <= MAX_LEN) or f < args.min_freq:
             continue
-        if g in vocab or g in mainland or is_simplified(g) or g[0] in EDGE_STOP or g[-1] in END_STOP or splits_into_known(g, vocab):
+        if g in vocab or g in mainland or is_simplified(g) or g[0] in START_STOP or g[-1] in END_STOP or splits_into_known(g, vocab):
             continue
         pmi = min(math.log(p(g) / (p(g[:k]) * p(g[k:]))) for k in range(1, len(g)))
         le, re_ = entropy(left[g]), entropy(right[g])
