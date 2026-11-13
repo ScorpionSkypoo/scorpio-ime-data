@@ -1,6 +1,6 @@
 {
   "schema": 1,
-  "updated": "2026-11-09T07:56:14Z",
+  "updated": "2026-11-13T06:54:02Z",
   "packs": [
     {
       "id": "core",
@@ -305,10 +305,10 @@
       "id": "dachen_samsung",
       "name": "注音（大千・三星鍵位）",
       "description": "跟三星鍵盤一樣的大千鍵位：ㄦ 在右上角、刪除鍵在第 4 排最右邊，第 2、3 排錯開半鍵；空白鍵右邊是句號。",
-      "version": "2026.10.27.1655",
-      "size": 588,
-      "sha256": "aa8ed267180d7bcb962c914c5479edf38600688a3a2be603683af986d7f952d7",
-      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.10.27.1655/dachen_samsung-2026.10.27.1655.json",
+      "version": "2026.11.13.1453",
+      "size": 1035,
+      "sha256": "a8435afd86c04b783bf7f3737952378c625538b0a3114014e6b082d1e3afa5d2",
+      "url": "https://github.com/ScorpionSkypoo/scorpio-ime-data/releases/download/packs-2026.11.13.1453/dachen_samsung-2026.11.13.1453.json",
       "minAppVersion": 174,
       "requires": [],
       "language": "zh-TW",
