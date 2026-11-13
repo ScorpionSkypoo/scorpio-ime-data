@@ -89,6 +89,20 @@ def validate_long(long, path, engine):
                 f"{path}：long 的「{k}」選項要是 1～8 個字、不能有空白"
 
 
+def validate_symbols(pages, path):
+    """版面自帶的符號鍵盤（選填，規則跟 App 的 ImeConfig.parseSymbolPages 一樣，見 README〈符號鍵盤〉）"""
+    assert isinstance(pages, list) and pages, f"{path}：symbols 要是至少一頁的陣列"
+    for i, pg in enumerate(pages):
+        rows, row3 = pg.get("rows"), pg.get("row3")
+        assert isinstance(rows, list) and 2 <= len(rows) <= 3, f"{path}：符號第 {i + 1} 頁要有 2～3 排"
+        assert all(isinstance(r, list) and len(r) == 10 for r in rows), f"{path}：符號第 {i + 1} 頁每排要剛好 10 個"
+        assert isinstance(row3, list) and 5 <= len(row3) <= 8, f"{path}：符號第 {i + 1} 頁的 row3 要 5～8 個"
+        for sym in [x for r in rows for x in r] + row3:
+            assert isinstance(sym, str) and 1 <= len(sym) <= 4, f"{path}：符號第 {i + 1} 頁的「{sym}」要是 1～4 個字"
+        label = pg.get("pageLabel", "")
+        assert isinstance(label, str) and len(label) <= 4, f"{path}：pageLabel 最多 4 個字"
+
+
 def validate(p, path, pack_ids):
     assert p.get("schema", 1) <= SCHEMA, f"{path}：schema 太新"
     for key in ("id", "name", "engine", "language", "languageName"):
@@ -104,6 +118,8 @@ def validate(p, path, pack_ids):
         assert p.get("minAppVersion", 0) >= MIN_APP_VERSION_DACHEN, f"{path}：大千的版面 minAppVersion 至少 {MIN_APP_VERSION_DACHEN}"
     if "long" in p:
         validate_long(p["long"], path, p["engine"])
+    if "symbols" in p:
+        validate_symbols(p["symbols"], path)
     for r in p.get("requires", []):
         assert r in pack_ids, f"{path}：requires 的 {r} 不在 packs.json"
     if "keys" in p:
