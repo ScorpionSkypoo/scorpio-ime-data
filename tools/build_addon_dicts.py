@@ -104,6 +104,23 @@ for line in open(f"{root}/sources/lm_word_penalty.tsv", encoding="utf-8"):
         w, p = line.rstrip("\n").split("\t")
         lm_penalty[w] = float(p)
 
+# 主詞庫刪掉的詞（core_fixes.txt 的 [刪除] 沒寫讀音的：支語、錯字）與大陸用語（mainland_terms.txt）：
+# 辭典、資訊術語包原本只排除「主詞庫還有的詞」，主詞庫刪掉的「視頻、激光、調用」又會從這兩包回來
+banned = set()
+section = None
+for line in open(f"{root}/sources/core_fixes.txt", encoding="utf-8"):
+    line = line.strip()
+    if not line or line.startswith("#"):
+        continue
+    if line.startswith("["):
+        section = line
+    elif section == "[刪除]" and len(line.split()) == 1:
+        banned.add(line)
+for line in open(f"{root}/sources/mainland_terms.txt", encoding="utf-8"):
+    line = line.strip()
+    if line and not line.startswith("#"):
+        banned.add(line)
+
 
 # 0. 流行與口語用語
 section = None
@@ -218,7 +235,7 @@ if have("naer_cs_terms.csv"):
         for x in csv.DictReader(f):
             for part in re.split(r"[；;、,，/]", x["中文名稱"]):
                 w = re.sub(r"[（(\[【].*?[)）\]】]", "", part).strip()
-                if w in seen or not re.fullmatch(r"[\u4e00-\u9fff]{2,6}", w) or w in known or composable(w) or mainland(w):
+                if w in seen or not re.fullmatch(r"[\u4e00-\u9fff]{2,6}", w) or w in known or w in banned or composable(w) or mainland(w):
                     continue
                 seen.add(w)
                 add(w, -6.8 - lm_penalty.get(w, 0.0), "cs_terms")
@@ -230,7 +247,7 @@ if have("dict-revised.json"):
     BOPO = re.compile(r"^[\u3105-\u3129ˊˇˋ˙]+$")
     for e in json.load(open(f"{raw}/dict-revised.json", encoding="utf-8")):
         w = e.get("title", "")
-        if not re.fullmatch(r"[\u4e00-\u9fff]{2,8}", w) or w in word_reading:
+        if not re.fullmatch(r"[\u4e00-\u9fff]{2,8}", w) or w in word_reading or w in banned:
             continue
         for h in e.get("heteronyms", []):
             syl = []

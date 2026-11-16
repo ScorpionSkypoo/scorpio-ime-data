@@ -58,6 +58,10 @@ def is_multi(w):
 
 
 rows = {t: db.execute(f"SELECT rowid, word, base_score FROM {t}").fetchall() for t in TABLES}
+# 教育部國語辭典、資訊工程術語是選用的大包，不拉（照樣算進書面機率的尺度）：口語詞頻只在主詞庫重播驗證過，
+# 拉到這兩包時「鮮食、低脂、裸機」到 −4.5～−5，搶走「顯示、地址、邏輯」（2026-11-16 手機重播第一 85.6% → 85.2%）
+NO_RAISE = ("moe_dict", "cs_terms")
+no_raise = {r[0] for r in db.execute(f"SELECT rowid FROM addon_dict WHERE source IN {NO_RAISE}")}
 
 # 書面機率的尺度：主詞庫所有詞 10^分數 的總和（分數是 log10 機率但沒有正規化）
 Z = sum(10 ** s for _, w, s in rows["dict"] if not w.startswith("MACRO@"))
@@ -90,7 +94,7 @@ for t in TABLES:
     upd = []
     for rowid, w, s in rows[t]:
         new = single_new.get(rowid, s) if t == "dict" else s
-        if is_multi(w) and s <= RARE and counts.get(w, 0) >= MIN_COUNT:
+        if is_multi(w) and s <= RARE and counts.get(w, 0) >= MIN_COUNT and not (t == "addon_dict" and rowid in no_raise):
             p_colloq = counts[w] / total * scale * (10 ** s / word_mass[w])
             cand = math.log10((LAMBDA * 10 ** s / Z + (1 - LAMBDA) * p_colloq) * Z)
             if cand >= s + MIN_GAIN:
