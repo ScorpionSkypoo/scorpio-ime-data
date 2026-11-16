@@ -97,6 +97,14 @@ def have(*names):
     return all(os.path.exists(f"{raw}/{n}") for n in names)
 
 
+# 固定分數的附加詞庫（教育部國語辭典、資訊工程術語）照語言模型扣分，罕用詞不再跟常用詞同分（tools/lm_word_penalty.py）
+lm_penalty = {}
+for line in open(f"{root}/sources/lm_word_penalty.tsv", encoding="utf-8"):
+    if not line.startswith("#"):
+        w, p = line.rstrip("\n").split("\t")
+        lm_penalty[w] = float(p)
+
+
 # 0. 流行與口語用語
 section = None
 for line in open(f"{root}/sources/trendy.txt", encoding="utf-8"):
@@ -213,7 +221,7 @@ if have("naer_cs_terms.csv"):
                 if w in seen or not re.fullmatch(r"[\u4e00-\u9fff]{2,6}", w) or w in known or composable(w) or mainland(w):
                     continue
                 seen.add(w)
-                add(w, -6.8, "cs_terms")
+                add(w, -6.8 - lm_penalty.get(w, 0.0), "cs_terms")
 
 # 6. 教育部國語辭典（重編國語辭典修訂本，g0v moedict-data）：詞條與官方注音，只收主詞庫沒有的詞
 #    依教育部對 CC BY-ND 的解釋，格式轉換與後續應用不算改作；這裡只取詞條與注音，不動釋義文字
@@ -231,7 +239,7 @@ if have("dict-revised.json"):
                     x = x[1:] + "˙"
                 syl.append(x)
             if len(syl) == len(w) and all(BOPO.match(x) for x in syl):
-                add(w, -6.6, "moe_dict", "-".join(syl))
+                add(w, -6.6 - lm_penalty.get(w, 0.0), "moe_dict", "-".join(syl))
                 break
 
 # 7. 台灣生活用語：主詞庫沒有的常用詞（免運、截圖、貼文、按讚…）；分數先給冷門詞的程度，
